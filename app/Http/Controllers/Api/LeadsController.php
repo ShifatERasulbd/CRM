@@ -43,6 +43,7 @@ class LeadsController extends Controller
                 'company' => 'nullable|string|max:255',
                 'status' => 'nullable|string|max:255',
                 'source' => 'nullable|string|max:255',
+                'service_id' => 'nullable|exists:services,id',
                 'assigned_to' => 'nullable|exists:users,id',
                 'created_by' => 'required|integer|exists:users,id',
                 'notes' => 'nullable|string',
@@ -105,6 +106,7 @@ class LeadsController extends Controller
                 'company' => 'nullable|string|max:255',
                 'status' => 'nullable|string|max:255',
                 'source' => 'nullable|string|max:255',
+                'service_id' => 'nullable|exists:services,id',
                 'assigned_to' => 'nullable|exists:users,id',
                 'notes' => 'nullable|string',
             ]);

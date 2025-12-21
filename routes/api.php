@@ -36,5 +36,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
    // TaskFollowups resource routes
        Route::apiResource('task-followups', App\Http\Controllers\Api\TaskFollowupsController::class);
+
+   // Employees resource routes
+       Route::apiResource('employees', App\Http\Controllers\Api\EmployeesController::class);
 });
 

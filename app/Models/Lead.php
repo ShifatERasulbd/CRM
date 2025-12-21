@@ -17,12 +17,20 @@ class Lead extends Model
         'company',
         'status',
         'source',
+        'service_id',
         'assigned_to',
         'created_by',
         'notes',
         'is_converted',
         'converted_at',
     ];
+    /**
+     * Get the service for this lead
+     */
+    public function service()
+    {
+        return $this->belongsTo(Service::class, 'service_id');
+    }
 
     protected $casts = [
         'is_converted' => 'boolean',

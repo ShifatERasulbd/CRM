@@ -3,6 +3,9 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 export default function LeadsForm({ onSuccess, initialData = null, isEdit = false }) {
+  const [services, setServices] = useState([]);
+  const [servicesLoading, setServicesLoading] = useState(true);
+  const [servicesError, setServicesError] = useState(null);
   const [form, setForm] = useState(
     initialData || {
       first_name: "",
@@ -25,6 +28,39 @@ export default function LeadsForm({ onSuccess, initialData = null, isEdit = fals
       setForm(initialData);
     }
   }, [initialData]);
+
+  // Fetch services for dropdown
+  useEffect(() => {
+    const fetchServices = async () => {
+      setServicesLoading(true);
+      setServicesError(null);
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          setServicesError("You must be logged in to view services");
+          setServicesLoading(false);
+          return;
+        }
+        const res = await axios.get("/api/services", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+          },
+        });
+        let servicesData = res.data;
+        if (!Array.isArray(servicesData)) {
+          servicesData = [];
+        }
+        setServices(servicesData);
+      } catch (err) {
+        setServicesError(err.response?.data?.message || "Failed to load services");
+        setServices([]);
+      } finally {
+        setServicesLoading(false);
+      }
+    };
+    fetchServices();
+  }, []);
 
   function handleChange(e) {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -116,7 +152,7 @@ export default function LeadsForm({ onSuccess, initialData = null, isEdit = fals
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 bg-white p-6 rounded-lg shadow max-w-xl mx-auto">
+    <form onSubmit={handleSubmit} className="space-y-4 bg-white p-6 rounded-lg shadow max-w-6xl mx-auto">
       <h2 className="text-lg font-semibold mb-2">{isEdit ? "Edit Lead" : "Add Lead"}</h2>
 
       {error && (
@@ -125,7 +161,8 @@ export default function LeadsForm({ onSuccess, initialData = null, isEdit = fals
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+               
         <div>
           <label className="block text-sm font-medium mb-1">First Name *</label>
           <input
@@ -205,19 +242,50 @@ export default function LeadsForm({ onSuccess, initialData = null, isEdit = fals
             <p className="text-red-500 text-xs mt-1">{validationErrors.status[0]}</p>
           )}
         </div>
-        <div>
+
+          <div>
           <label className="block text-sm font-medium mb-1">Source</label>
-          <input
-            name="source"
+          <select
+           name="source"
             value={form.source}
             onChange={handleChange}
-            className={`w-full border rounded px-3 py-2 ${validationErrors.source ? 'border-red-500' : ''}`}
-          />
+            className={`w-full border rounded px-3 py-2 ${validationErrors.status ? 'border-red-500' : ''}`}
+          >
+            <option value="walking">Walking </option>
+            <option value="facebook">Facebook</option>
+            <option value="whatsapp">WhatsApp</option>
+            <option value="phone">Phone</option>
+          </select>
           {validationErrors.source && (
             <p className="text-red-500 text-xs mt-1">{validationErrors.source[0]}</p>
           )}
         </div>
-        <div className="md:col-span-2">
+
+          <div>
+            <label className="block text-sm font-medium mb-1">Service</label>
+            {servicesLoading ? (
+              <div className="text-gray-500 text-xs">Loading services...</div>
+            ) : servicesError ? (
+              <div className="text-red-500 text-xs">{servicesError}</div>
+            ) : (
+              <select
+                name="service_id"
+                value={form.service_id || ""}
+                onChange={handleChange}
+                className={`w-full border rounded px-3 py-2 ${validationErrors.service_id ? 'border-red-500' : ''}`}
+              >
+                <option value="">Select a service</option>
+                {services.map(service => (
+                  <option key={service.id} value={service.id}>{service.name}</option>
+                ))}
+              </select>
+            )}
+            {validationErrors.service_id && (
+              <p className="text-red-500 text-xs mt-1">{validationErrors.service_id[0]}</p>
+            )}
+          </div>
+       
+        <div className="md:col-span-3">
           <label className="block text-sm font-medium mb-1">Notes</label>
           <textarea
             name="notes"
@@ -230,6 +298,7 @@ export default function LeadsForm({ onSuccess, initialData = null, isEdit = fals
             <p className="text-red-500 text-xs mt-1">{validationErrors.notes[0]}</p>
           )}
         </div>
+       
       </div>
       <button
         type="submit"
