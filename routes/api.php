@@ -16,4 +16,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Leads resource routes
     Route::apiResource('leads', LeadsController::class);
+
+    // Customers resource routes
+    Route::apiResource('customers', \App\Http\Controllers\Api\CustomersController::class);
+
+    // Oppertunities resource routes
+    Route::apiResource('oppertunities', \App\Http\Controllers\Api\OppertunitiesController::class);
 });
