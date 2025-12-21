@@ -1,3 +1,4 @@
+        
     
 <?php
 
@@ -26,5 +27,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Deals resource routes
     Route::apiResource('deals', \App\Http\Controllers\Api\DealsController::class);
+
+    // Services resource routes
+    Route::apiResource('services', \App\Http\Controllers\Api\ServicesController::class);
 });
 
