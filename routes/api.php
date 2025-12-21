@@ -9,7 +9,7 @@ use App\Http\Controllers\Api\AuthController;
 
 // Public routes
 Route::post('/login', [AuthController::class, 'login']);
-
+     
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
     // Auth routes
@@ -30,5 +30,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Services resource routes
     Route::apiResource('services', \App\Http\Controllers\Api\ServicesController::class);
+    
+   // Activities resource routes
+        Route::apiResource('activities', App\Http\Controllers\Api\ActivitiesController::class);
 });
 
