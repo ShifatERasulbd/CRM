@@ -10,7 +10,7 @@ export default function Sidebar() {
       await axios.post("/logout");
     } catch (e) {}
     localStorage.removeItem("token");
-    navigate("/login");
+    navigate("/");
   };
 
   return (
