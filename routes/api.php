@@ -32,6 +32,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('services', \App\Http\Controllers\Api\ServicesController::class);
     
    // Activities resource routes
-        Route::apiResource('activities', App\Http\Controllers\Api\ActivitiesController::class);
+       Route::apiResource('activities', App\Http\Controllers\Api\ActivitiesController::class);
+
+   // TaskFollowups resource routes
+       Route::apiResource('task-followups', App\Http\Controllers\Api\TaskFollowupsController::class);
 });
 
