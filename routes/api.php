@@ -1,3 +1,4 @@
+    
 <?php
 
 use Illuminate\Http\Request;
@@ -22,4 +23,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Oppertunities resource routes
     Route::apiResource('oppertunities', \App\Http\Controllers\Api\OppertunitiesController::class);
+
+    // Deals resource routes
+    Route::apiResource('deals', \App\Http\Controllers\Api\DealsController::class);
 });
+
