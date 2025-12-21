@@ -6,16 +6,18 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Oppertunity;
 use Illuminate\Support\Facades\Log;
-
+use App\Models\Lead;
 class OppertunitiesController extends Controller
 {
     public function index()
     {
         try {
-            $oppertunities = Oppertunity::with('assignedTo', 'createdBy')->latest()->get();
+            $oppertunities =  Lead::with('assignedTo', 'createdBy')->where('status', 'qualified')
+                ->latest()
+                ->get();
             return response()->json($oppertunities);
         } catch (\Exception $e) {
-            Log::error('Error fetching oppertunities: ' . $e->getMessage());
+        
             return response()->json([
                 'message' => 'Error fetching oppertunities',
                 'error' => $e->getMessage()

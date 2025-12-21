@@ -6,6 +6,41 @@ export default function LeadsForm({ onSuccess, initialData = null, isEdit = fals
   const [services, setServices] = useState([]);
   const [servicesLoading, setServicesLoading] = useState(true);
   const [servicesError, setServicesError] = useState(null);
+  const [employees, setEmployees] = useState([]);
+  const [employeesLoading, setEmployeesLoading] = useState(true);
+  const [employeesError, setEmployeesError] = useState(null);
+    // Fetch employees for assign to dropdown
+    useEffect(() => {
+      const fetchEmployees = async () => {
+        setEmployeesLoading(true);
+        setEmployeesError(null);
+        try {
+          const token = localStorage.getItem("token");
+          if (!token) {
+            setEmployeesError("You must be logged in to view employees");
+            setEmployeesLoading(false);
+            return;
+          }
+          const res = await axios.get("/api/employees", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              Accept: "application/json",
+            },
+          });
+          let employeesData = res.data;
+          if (!Array.isArray(employeesData)) {
+            employeesData = [];
+          }
+          setEmployees(employeesData);
+        } catch (err) {
+          setEmployeesError(err.response?.data?.message || "Failed to load employees");
+          setEmployees([]);
+        } finally {
+          setEmployeesLoading(false);
+        }
+      };
+      fetchEmployees();
+    }, []);
   const [form, setForm] = useState(
     initialData || {
       first_name: "",
@@ -234,12 +269,37 @@ export default function LeadsForm({ onSuccess, initialData = null, isEdit = fals
             className={`w-full border rounded px-3 py-2 ${validationErrors.status ? 'border-red-500' : ''}`}
           >
             <option value="new">New</option>
+            <option value="contracting">Contracting/Pricing</option>
             <option value="contacted">Contacted</option>
             <option value="qualified">Qualified</option>
             <option value="lost">Lost</option>
           </select>
           {validationErrors.status && (
             <p className="text-red-500 text-xs mt-1">{validationErrors.status[0]}</p>
+          )}
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-1">Assign To</label>
+          {employeesLoading ? (
+            <div className="text-gray-500 text-xs">Loading employees...</div>
+          ) : employeesError ? (
+            <div className="text-red-500 text-xs">{employeesError}</div>
+          ) : (
+            <select
+              name="assigned_to"
+              value={form.assigned_to || ""}
+              onChange={handleChange}
+              className={`w-full border rounded px-3 py-2 ${validationErrors.assigned_to ? 'border-red-500' : ''}`}
+            >
+              <option value="">Select employee</option>
+              {employees.map(emp => (
+                <option key={emp.id} value={emp.id}>{emp.first_name} {emp.last_name}</option>
+              ))}
+            </select>
+          )}
+          {validationErrors.assigned_to && (
+            <p className="text-red-500 text-xs mt-1">{validationErrors.assigned_to[0]}</p>
           )}
         </div>
 

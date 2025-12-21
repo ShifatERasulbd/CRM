@@ -5,14 +5,17 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Deal;
+use App\Models\Lead;
 use Illuminate\Support\Facades\Log;
-
+ 
 class DealsController extends Controller
 {
     public function index()
     {
         try {
-            $deals = Deal::with(['lead', 'customer', 'assignedTo', 'createdBy'])->latest()->get();
+            $deals =  Lead::with('assignedTo', 'createdBy')->where('status', 'contracting')
+                ->latest()
+                ->get();
             return response()->json($deals);
         } catch (\Exception $e) {
             Log::error('Error fetching deals: ' . $e->getMessage());

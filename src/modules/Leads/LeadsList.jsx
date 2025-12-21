@@ -92,10 +92,32 @@ export default function LeadsList() {
     );
   }
 
-  return (
-    <div className="mt-8 max-w-4xl mx-auto">
-      <h2 className="text-lg font-semibold mb-2">Leads</h2>
-      <div className="overflow-x-auto rounded-lg shadow bg-white">
+    // Statistics
+    const totalLeads = leads.length;
+    const statusCounts = leads.reduce((acc, lead) => {
+      acc[lead.status] = (acc[lead.status] || 0) + 1;
+      return acc;
+    }, {});
+
+    return (
+      <div className="mt-8 max-w-4xl mx-auto">
+        <h2 className="text-lg font-semibold mb-2">Leads</h2>
+
+        {/* Statistics Section */}
+        <div className="mb-4 grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="bg-gray-100 rounded p-3 text-center">
+            <div className="text-xs text-gray-500">Total Leads</div>
+            <div className="text-lg font-bold">{totalLeads}</div>
+          </div>
+          {Object.entries(statusCounts).map(([status, count]) => (
+            <div key={status} className="bg-gray-100 rounded p-3 text-center">
+              <div className="text-xs text-gray-500">{status.charAt(0).toUpperCase() + status.slice(1)}</div>
+              <div className="text-lg font-bold">{count}</div>
+            </div>
+          ))}
+        </div>
+
+        <div className="overflow-x-auto rounded-lg shadow bg-white">
         <table className="min-w-full text-sm border-collapse">
           <thead>
             <tr className="bg-gray-50">
@@ -103,6 +125,7 @@ export default function LeadsList() {
               <th className="px-4 py-2 text-left font-medium text-gray-700 border-b">Email</th>
               <th className="px-4 py-2 text-left font-medium text-gray-700 border-b">Phone</th>
               <th className="px-4 py-2 text-left font-medium text-gray-700 border-b">Company</th>
+              <th className="px-4 py-2 text-left font-medium text-gray-700 border-b">Service</th>
               <th className="px-4 py-2 text-left font-medium text-gray-700 border-b">Status</th>
               <th className="px-4 py-2 text-left font-medium text-gray-700 border-b">Actions</th>
             </tr>
@@ -114,6 +137,7 @@ export default function LeadsList() {
                 <td className="px-4 py-2">{lead.email}</td>
                 <td className="px-4 py-2">{lead.phone}</td>
                 <td className="px-4 py-2">{lead.company}</td>
+                <td className="px-4 py-2">{lead.service?.name || ''}</td>
                 <td className="px-4 py-2">{lead.status}</td>
                 <td className="px-4 py-2 flex gap-2">
                   <button

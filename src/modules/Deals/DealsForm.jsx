@@ -115,7 +115,7 @@ export default function DealsForm({ onSuccess, initialData = null, isEdit = fals
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">{error}</div>
       )}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
           <label className="block text-sm font-medium mb-1">Title *</label>
           <input
@@ -226,7 +226,7 @@ export default function DealsForm({ onSuccess, initialData = null, isEdit = fals
             <p className="text-red-500 text-xs mt-1">{validationErrors.assigned_to[0]}</p>
           )}
         </div>
-        <div>
+        <div className="md:col-span-3">
           <label className="block text-sm font-medium mb-1">Description</label>
           <textarea
             name="description"

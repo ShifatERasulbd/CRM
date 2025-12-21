@@ -1,8 +1,7 @@
 import React, { useState } from "react";
-import OppertunitiesForm from "./OppertunitiesForm";
+import LeadsForm from "../Leads/LeadsForm";
 import OppertunitiesList from "./OppertunitiesList";
-
-export default function Oppertunities() {
+export default function Leads() {
   const [refresh, setRefresh] = useState(0);
   const [showModal, setShowModal] = useState(false);
 
@@ -13,7 +12,7 @@ export default function Oppertunities() {
           className="bg-black text-white px-4 py-2 rounded font-semibold hover:bg-gray-900"
           onClick={() => setShowModal(true)}
         >
-          Add Oppertunity
+          Add Lead
         </button>
       </div>
       {showModal && (
@@ -25,7 +24,7 @@ export default function Oppertunities() {
             >
               &times;
             </button>
-            <OppertunitiesForm
+            <LeadsForm
               onSuccess={() => {
                 setShowModal(false);
                 setRefresh(r => r + 1);

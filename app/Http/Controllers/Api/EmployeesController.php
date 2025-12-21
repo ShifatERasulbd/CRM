@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Employee;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 class EmployeesController extends Controller
@@ -28,8 +30,23 @@ class EmployeesController extends Controller
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
-        $employee = Employee::create($validator->validated());
-        return response()->json($employee, 201);
+        // Create the user first
+        $user = User::create([
+            'name' => $request->first_name . ' ' . $request->last_name,
+            'email' => $request->email,
+            // Default password: use a random string or a default, here 'password' (should be changed by user)
+            'password' => Hash::make('password'),
+        ]);
+
+        // Create the employee and link to user if needed
+        $employeeData = $validator->validated();
+        // Optionally, if you want to store user_id in employees table, add 'user_id' => $user->id
+        $employee = Employee::create($employeeData);
+
+        return response()->json([
+            'employee' => $employee,
+            'user' => $user
+        ], 201);
     }
 
     public function show($id)

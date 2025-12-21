@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\Api;
-
+use App\Models\Oppertunity;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Lead;
@@ -51,6 +51,7 @@ class LeadsController extends Controller
 
             $lead = Lead::create($validated);
 
+           
             return response()->json([
                 'message' => 'Lead created successfully',
                 'data' => $lead
