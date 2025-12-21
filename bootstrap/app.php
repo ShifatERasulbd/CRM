@@ -31,5 +31,50 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        // Handle API exceptions to return JSON instead of HTML
+        $exceptions->render(function (\Throwable $e, $request) {
+            if ($request->is('api/*')) {
+                $status = method_exists($e, 'getStatusCode') ? $e->getStatusCode() : 500;
+
+                // Handle validation exceptions
+                if ($e instanceof \Illuminate\Validation\ValidationException) {
+                    return response()->json([
+                        'message' => 'Validation failed',
+                        'errors' => $e->errors(),
+                    ], 422);
+                }
+
+                // Handle model not found exceptions
+                if ($e instanceof \Illuminate\Database\Eloquent\ModelNotFoundException) {
+                    return response()->json([
+                        'message' => 'Resource not found',
+                    ], 404);
+                }
+
+                // Handle authentication exceptions
+                if ($e instanceof \Illuminate\Auth\AuthenticationException) {
+                    return response()->json([
+                        'message' => 'Unauthenticated',
+                    ], 401);
+                }
+
+                // Handle authorization exceptions
+                if ($e instanceof \Illuminate\Auth\Access\AuthorizationException) {
+                    return response()->json([
+                        'message' => 'Unauthorized',
+                    ], 403);
+                }
+
+                // Generic error response
+                return response()->json([
+                    'message' => $e->getMessage() ?: 'Server Error',
+                    'error' => config('app.debug') ? [
+                        'exception' => get_class($e),
+                        'file' => $e->getFile(),
+                        'line' => $e->getLine(),
+                        'trace' => $e->getTraceAsString(),
+                    ] : null,
+                ], $status >= 100 && $status < 600 ? $status : 500);
+            }
+        });
     })->create();

@@ -32,8 +32,9 @@ export default function Login() {
         throw new Error(data.message || "Login failed");
       }
 
-      // Save token
+      // Save token and user data
       localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
 
       // Redirect after login
       navigate("/dashboard");

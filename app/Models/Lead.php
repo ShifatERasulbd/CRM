@@ -23,4 +23,25 @@ class Lead extends Model
         'is_converted',
         'converted_at',
     ];
+
+    protected $casts = [
+        'is_converted' => 'boolean',
+        'converted_at' => 'datetime',
+    ];
+
+    /**
+     * Get the user who created this lead
+     */
+    public function createdBy()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    /**
+     * Get the user this lead is assigned to
+     */
+    public function assignedTo()
+    {
+        return $this->belongsTo(User::class, 'assigned_to');
+    }
 }
