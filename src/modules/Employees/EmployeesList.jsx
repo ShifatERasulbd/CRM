@@ -76,8 +76,40 @@ export default function EmployeesList() {
     return <div className="text-red-600 font-semibold">{error}</div>;
   }
 
+  // Statistics
+  const totalEmployees = employees.length;
+  const departmentCounts = employees.reduce((acc, emp) => {
+    if (emp.department) acc[emp.department] = (acc[emp.department] || 0) + 1;
+    return acc;
+  }, {});
+  const positionCounts = employees.reduce((acc, emp) => {
+    if (emp.position) acc[emp.position] = (acc[emp.position] || 0) + 1;
+    return acc;
+  }, {});
+
   return (
-    <div className="overflow-x-auto">
+    <div className="max-w-6xl mx-auto">
+      <h2 className="text-lg font-semibold mb-2">Employees</h2>
+      {/* Statistics Section */}
+      <div className="mb-4 grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="bg-gray-100 rounded p-3 text-center">
+          <div className="text-xs text-gray-500">Total Employees</div>
+          <div className="text-lg font-bold">{totalEmployees}</div>
+        </div>
+        {Object.entries(departmentCounts).map(([dept, count]) => (
+          <div key={dept} className="bg-gray-100 rounded p-3 text-center">
+            <div className="text-xs text-gray-500">Dept: {dept}</div>
+            <div className="text-lg font-bold">{count}</div>
+          </div>
+        ))}
+        {Object.entries(positionCounts).map(([pos, count]) => (
+          <div key={pos} className="bg-gray-100 rounded p-3 text-center">
+            <div className="text-xs text-gray-500">Position: {pos}</div>
+            <div className="text-lg font-bold">{count}</div>
+          </div>
+        ))}
+      </div>
+      <div className="overflow-x-auto">
       <table className="min-w-full border">
         <thead>
           <tr className="bg-gray-100">
@@ -123,6 +155,8 @@ export default function EmployeesList() {
           ))}
         </tbody>
       </table>
+      </div>
+
       {editEmployee && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
           <div className="bg-white rounded-lg shadow-lg p-6 relative w-full max-w-xl">
@@ -142,6 +176,7 @@ export default function EmployeesList() {
           </div>
         </div>
       )}
+
     </div>
   );
 }

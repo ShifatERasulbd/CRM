@@ -9,15 +9,24 @@ use Illuminate\Support\Facades\Log;
 use App\Models\Lead;
 class OppertunitiesController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         try {
-            $oppertunities =  Lead::with('assignedTo', 'createdBy')->where('status', 'qualified')
-                ->latest()
-                ->get();
+            $user = $request->user();
+            if ($user && $user->email === 'test@example.com') {
+                $oppertunities = Lead::with('assignedTo', 'createdBy')
+                    ->where('status', 'qualified')
+                    ->latest()
+                    ->get();
+            } else {
+                $oppertunities = Lead::with('assignedTo', 'createdBy')
+                    ->where('status', 'qualified')
+                    ->where('assigned_to', $user->id)
+                    ->latest()
+                    ->get();
+            }
             return response()->json($oppertunities);
         } catch (\Exception $e) {
-        
             return response()->json([
                 'message' => 'Error fetching oppertunities',
                 'error' => $e->getMessage()

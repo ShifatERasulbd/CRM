@@ -10,12 +10,22 @@ use Illuminate\Support\Facades\Log;
  
 class DealsController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         try {
-            $deals =  Lead::with('assignedTo', 'createdBy')->where('status', 'contracting')
-                ->latest()
-                ->get();
+            $user = $request->user();
+            if ($user && $user->email === 'test@example.com') {
+                $deals = Lead::with('assignedTo', 'createdBy')
+                    ->where('status', 'contracting')
+                    ->latest()
+                    ->get();
+            } else {
+                $deals = Lead::with('assignedTo', 'createdBy')
+                    ->where('status', 'contracting')
+                    ->where('assigned_to', $user->id)
+                    ->latest()
+                    ->get();
+            }
             return response()->json($deals);
         } catch (\Exception $e) {
             Log::error('Error fetching deals: ' . $e->getMessage());

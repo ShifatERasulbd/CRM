@@ -12,13 +12,22 @@ class LeadsController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         try {
-            $leads = Lead::with('assignedTo', 'createdBy')
-                ->latest()
-                ->get();
-
+            $user = $request->user();
+            // If admin (test@example.com), show all leads
+            if ($user && $user->email === 'test@example.com') {
+                $leads = Lead::with('assignedTo', 'createdBy')
+                    ->latest()
+                    ->get();
+            } else {
+                // Otherwise, only show leads assigned to this user
+                $leads = Lead::with('assignedTo', 'createdBy')
+                    ->where('assigned_to', $user->id)
+                    ->latest()
+                    ->get();
+            }
             return response()->json($leads);
         } catch (\Exception $e) {
             Log::error('Error fetching leads: ' . $e->getMessage());
