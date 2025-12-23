@@ -17,6 +17,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 
     // Leads resource routes
+    Route::get('leads/graph', [LeadsController::class, 'graph']);
     Route::apiResource('leads', LeadsController::class);
 
     // Customers resource routes

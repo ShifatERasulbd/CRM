@@ -1,5 +1,22 @@
 @import 'tailwindcss';
 
+body {
+    font-size: 16px;
+    -webkit-tap-highlight-color: transparent;
+}
+
+@media (max-width: 640px) {
+    html {
+        font-size: 15px;
+    }
+    .sm\:p-6 {
+        padding: 1.25rem !important;
+    }
+    .sm\:text-sm {
+        font-size: 0.95rem !important;
+    }
+}
+
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 @source '../**/*.blade.php';

@@ -109,52 +109,46 @@ export default function EmployeesList() {
           </div>
         ))}
       </div>
-      <div className="overflow-x-auto">
-      <table className="min-w-full border">
-        <thead>
-          <tr className="bg-gray-100">
-            <th className="p-2 border">ID</th>
-            <th className="p-2 border">First Name</th>
-            <th className="p-2 border">Last Name</th>
-            <th className="p-2 border">Email</th>
-            <th className="p-2 border">Phone</th>
-            <th className="p-2 border">Position</th>
-            <th className="p-2 border">Department</th>
-            <th className="p-2 border">Hire Date</th>
-            <th className="p-2 border">Salary</th>
-            <th className="p-2 border">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {employees.map((employee) => (
-            <tr key={employee.id}>
-              <td className="p-2 border">{employee.id}</td>
-              <td className="p-2 border">{employee.first_name}</td>
-              <td className="p-2 border">{employee.last_name}</td>
-              <td className="p-2 border">{employee.email}</td>
-              <td className="p-2 border">{employee.phone}</td>
-              <td className="p-2 border">{employee.position}</td>
-              <td className="p-2 border">{employee.department}</td>
-              <td className="p-2 border">{employee.hire_date}</td>
-              <td className="p-2 border">{employee.salary}</td>
-              <td className="p-2 border space-x-2">
-                <button
-                  className="text-blue-600 hover:underline"
-                  onClick={() => setEditEmployee(employee)}
-                >
-                  Edit
-                </button>
-                <button
-                  className="text-red-600 hover:underline"
-                  onClick={() => handleDelete(employee.id)}
-                >
-                  Delete
-                </button>
-              </td>
+      <div className="overflow-x-auto rounded-lg shadow bg-white">
+        <table className="min-w-full text-sm border-collapse">
+          <thead>
+            <tr className="bg-gray-50">
+              <th className="px-4 py-2 text-left font-medium text-gray-700 border-b">First Name</th>
+              <th className="px-4 py-2 text-left font-medium text-gray-700 border-b">Last Name</th>
+              <th className="px-4 py-2 text-left font-medium text-gray-700 border-b">Email</th>
+              <th className="px-4 py-2 text-left font-medium text-gray-700 border-b">Phone</th>
+              <th className="px-4 py-2 text-left font-medium text-gray-700 border-b">Position</th>
+              <th className="px-4 py-2 text-left font-medium text-gray-700 border-b">Department</th>
+              <th className="px-4 py-2 text-left font-medium text-gray-700 border-b">Hire Date</th>
+              <th className="px-4 py-2 text-left font-medium text-gray-700 border-b">Salary</th>
+              <th className="px-4 py-2 text-left font-medium text-gray-700 border-b">Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {employees.map((employee) => (
+              <tr key={employee.id} className="border-b last:border-b-0 hover:bg-gray-50">
+                <td className="px-4 py-2">{employee.first_name}</td>
+                <td className="px-4 py-2">{employee.last_name}</td>
+                <td className="px-4 py-2">{employee.email}</td>
+                <td className="px-4 py-2">{employee.phone}</td>
+                <td className="px-4 py-2">{employee.position}</td>
+                <td className="px-4 py-2">{employee.department}</td>
+                <td className="px-4 py-2">{employee.hire_date}</td>
+                <td className="px-4 py-2">{employee.salary}</td>
+                <td className="px-4 py-2 flex gap-2">
+                  <button
+                    className="bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600"
+                    onClick={() => setEditEmployee(employee)}
+                  >Edit</button>
+                  <button
+                    className="bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600"
+                    onClick={() => handleDelete(employee.id)}
+                  >Delete</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
       {editEmployee && (

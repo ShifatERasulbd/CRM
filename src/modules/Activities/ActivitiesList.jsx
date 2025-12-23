@@ -77,46 +77,43 @@ export default function ActivitiesList() {
   }
 
   return (
-    <div className="overflow-x-auto">
-      <table className="min-w-full border">
-        <thead>
-          <tr className="bg-gray-100">
-            <th className="p-2 border">ID</th>
-            <th className="p-2 border">Title</th>
-            <th className="p-2 border">Description</th>
-            <th className="p-2 border">Date</th>
-            <th className="p-2 border">Type</th>
-            <th className="p-2 border">User</th>
-            <th className="p-2 border">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {activities.map((activity) => (
-            <tr key={activity.id}>
-              <td className="p-2 border">{activity.id}</td>
-              <td className="p-2 border">{activity.title}</td>
-              <td className="p-2 border">{activity.description}</td>
-              <td className="p-2 border">{activity.date}</td>
-              <td className="p-2 border">{activity.type}</td>
-              <td className="p-2 border">{activity.user ? activity.user.name : "-"}</td>
-              <td className="p-2 border space-x-2">
-                <button
-                  className="text-blue-600 hover:underline"
-                  onClick={() => setEditActivity(activity)}
-                >
-                  Edit
-                </button>
-                <button
-                  className="text-red-600 hover:underline"
-                  onClick={() => handleDelete(activity.id)}
-                >
-                  Delete
-                </button>
-              </td>
+    <div className="mt-8 max-w-4xl mx-auto">
+      <h2 className="text-lg font-semibold mb-2">Activities</h2>
+      <div className="overflow-x-auto rounded-lg shadow bg-white">
+        <table className="min-w-full text-sm border-collapse">
+          <thead>
+            <tr className="bg-gray-50">
+              <th className="px-4 py-2 text-left font-medium text-gray-700 border-b">Title</th>
+              <th className="px-4 py-2 text-left font-medium text-gray-700 border-b">Description</th>
+              <th className="px-4 py-2 text-left font-medium text-gray-700 border-b">Date</th>
+              <th className="px-4 py-2 text-left font-medium text-gray-700 border-b">Type</th>
+              <th className="px-4 py-2 text-left font-medium text-gray-700 border-b">User</th>
+              <th className="px-4 py-2 text-left font-medium text-gray-700 border-b">Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {activities.map((activity) => (
+              <tr key={activity.id} className="border-b last:border-b-0 hover:bg-gray-50">
+                <td className="px-4 py-2">{activity.title}</td>
+                <td className="px-4 py-2">{activity.description}</td>
+                <td className="px-4 py-2">{activity.date}</td>
+                <td className="px-4 py-2">{activity.type}</td>
+                <td className="px-4 py-2">{activity.user ? activity.user.name : "-"}</td>
+                <td className="px-4 py-2 flex gap-2">
+                  <button
+                    className="bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600"
+                    onClick={() => setEditActivity(activity)}
+                  >Edit</button>
+                  <button
+                    className="bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600"
+                    onClick={() => handleDelete(activity.id)}
+                  >Delete</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
       {editActivity && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
           <div className="bg-white rounded-lg shadow-lg p-6 relative w-full max-w-xl">

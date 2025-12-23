@@ -10,6 +10,46 @@ use Illuminate\Support\Facades\Log;
 class LeadsController extends Controller
 {
     /**
+     * Return leads count per day for the last N days (for dashboard graph)
+     */
+    public function graph(Request $request)
+    {
+        try {
+            $user = $request->user();
+            $days = (int) $request->query('days', 7);
+            $days = $days > 0 ? $days : 7;
+            $query = Lead::query();
+            if (!$user || $user->email !== 'test@example.com') {
+                $query->where('assigned_to', $user->id);
+            }
+            $fromDate = now()->subDays($days - 1)->startOfDay();
+            $toDate = now()->endOfDay();
+            $leads = $query->whereBetween('created_at', [$fromDate, $toDate])
+                ->selectRaw('DATE(created_at) as date, COUNT(*) as count')
+                ->groupByRaw('DATE(created_at)')
+                ->orderBy('date')
+                ->get();
+
+            // Fill missing days with 0
+            $result = [];
+            for ($i = 0; $i < $days; $i++) {
+                $date = now()->subDays($days - 1 - $i)->toDateString();
+                $found = $leads->firstWhere('date', $date);
+                $result[] = [
+                    'date' => $date,
+                    'count' => $found ? (int)$found->count : 0,
+                ];
+            }
+            return response()->json($result);
+        } catch (\Exception $e) {
+            Log::error('Error fetching leads graph: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Error fetching leads graph',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+    /**
      * Display a listing of the resource.
      */
     public function index(Request $request)

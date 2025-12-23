@@ -77,46 +77,43 @@ export default function TaskFollowupsList() {
   }
 
   return (
-    <div className="overflow-x-auto">
-      <table className="min-w-full border">
-        <thead>
-          <tr className="bg-gray-100">
-            <th className="p-2 border">ID</th>
-            <th className="p-2 border">Title</th>
-            <th className="p-2 border">Description</th>
-            <th className="p-2 border">Due Date</th>
-            <th className="p-2 border">Status</th>
-            <th className="p-2 border">User</th>
-            <th className="p-2 border">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {tasks.map((task) => (
-            <tr key={task.id}>
-              <td className="p-2 border">{task.id}</td>
-              <td className="p-2 border">{task.title}</td>
-              <td className="p-2 border">{task.description}</td>
-              <td className="p-2 border">{task.due_date}</td>
-              <td className="p-2 border">{task.status}</td>
-              <td className="p-2 border">{task.user ? task.user.name : "-"}</td>
-              <td className="p-2 border space-x-2">
-                <button
-                  className="text-blue-600 hover:underline"
-                  onClick={() => setEditTask(task)}
-                >
-                  Edit
-                </button>
-                <button
-                  className="text-red-600 hover:underline"
-                  onClick={() => handleDelete(task.id)}
-                >
-                  Delete
-                </button>
-              </td>
+    <div className="mt-8 max-w-4xl mx-auto">
+      <h2 className="text-lg font-semibold mb-2">Task & Followups</h2>
+      <div className="overflow-x-auto rounded-lg shadow bg-white">
+        <table className="min-w-full text-sm border-collapse">
+          <thead>
+            <tr className="bg-gray-50">
+              <th className="px-4 py-2 text-left font-medium text-gray-700 border-b">Title</th>
+              <th className="px-4 py-2 text-left font-medium text-gray-700 border-b">Description</th>
+              <th className="px-4 py-2 text-left font-medium text-gray-700 border-b">Due Date</th>
+              <th className="px-4 py-2 text-left font-medium text-gray-700 border-b">Status</th>
+              <th className="px-4 py-2 text-left font-medium text-gray-700 border-b">User</th>
+              <th className="px-4 py-2 text-left font-medium text-gray-700 border-b">Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {tasks.map((task) => (
+              <tr key={task.id} className="border-b last:border-b-0 hover:bg-gray-50">
+                <td className="px-4 py-2">{task.title}</td>
+                <td className="px-4 py-2">{task.description}</td>
+                <td className="px-4 py-2">{task.due_date}</td>
+                <td className="px-4 py-2">{task.status}</td>
+                <td className="px-4 py-2">{task.user ? task.user.name : "-"}</td>
+                <td className="px-4 py-2 flex gap-2">
+                  <button
+                    className="bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600"
+                    onClick={() => setEditTask(task)}
+                  >Edit</button>
+                  <button
+                    className="bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600"
+                    onClick={() => handleDelete(task.id)}
+                  >Delete</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
       {editTask && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
           <div className="bg-white rounded-lg shadow-lg p-6 relative w-full max-w-xl">

@@ -1,40 +1,64 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 
 const columns = [
-  { header: "Name", accessor: "name" },
+  { header: "First Name", accessor: "first_name" },
+  { header: "Last Name", accessor: "last_name" },
   { header: "Email", accessor: "email" },
-  { header: "Role", accessor: "role" },
-  { header: "Status", accessor: "status" },
-];
-
-const data = [
-  { name: "Olivia Martin", email: "olivia@example.com", role: "Admin", status: "Active" },
-  { name: "Isabella Smith", email: "isabella@example.com", role: "Editor", status: "Active" },
-  { name: "Ethan Williams", email: "ethan@example.com", role: "Viewer", status: "Inactive" },
-  { name: "Amelia Brown", email: "amelia@example.com", role: "Editor", status: "Active" },
-  { name: "Mason Davis", email: "mason@example.com", role: "Admin", status: "Inactive" },
+  { header: "Position", accessor: "position" },
+  { header: "Department", accessor: "department" },
 ];
 
 export default function DashboardTable() {
+  const [employees, setEmployees] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    async function fetchEmployees() {
+      setLoading(true);
+      setError(null);
+      try {
+        const token = localStorage.getItem("token");
+        const res = await axios.get("/api/employees", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+          },
+        });
+        setEmployees(Array.isArray(res.data) ? res.data.slice(0, 8) : []);
+      } catch (e) {
+        setError("Failed to load employees");
+        setEmployees([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchEmployees();
+  }, []);
+
+  if (loading) return <div className="p-6">Loading employees...</div>;
+  if (error) return <div className="p-6 text-red-600">{error}</div>;
+
   return (
-    <div className="rounded-lg  bg-white p-6 shadow">
-      <div className="font-semibold mb-4 text-lg">Users</div>
+    <div className="rounded-lg bg-white p-4 sm:p-6 shadow">
+      <div className="font-semibold mb-4 text-lg">Employees</div>
       <div className="overflow-x-auto">
-        <table className="min-w-full text-sm border-collapse">
+        <table className="min-w-full text-xs sm:text-sm border-collapse">
           <thead>
             <tr className="bg-gray-50">
               {columns.map((col) => (
-                <th key={col.accessor} className="px-4 py-2 text-left font-medium text-gray-700 border-b">
+                <th key={col.accessor} className="px-2 sm:px-4 py-2 text-left font-medium text-gray-700 border-b">
                   {col.header}
                 </th>
               ))}
             </tr>
           </thead>
           <tbody>
-            {data.map((row, idx) => (
-              <tr key={idx} className="border-b last:border-b-0 hover:bg-gray-50">
+            {employees.map((row, idx) => (
+              <tr key={row.id || idx} className="border-b last:border-b-0 hover:bg-gray-50">
                 {columns.map((col) => (
-                  <td key={col.accessor} className="px-4 py-2">
+                  <td key={col.accessor} className="px-2 sm:px-4 py-2">
                     {row[col.accessor]}
                   </td>
                 ))}

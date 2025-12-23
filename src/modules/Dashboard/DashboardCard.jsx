@@ -40,20 +40,20 @@ export default function DashboardCard() {
   }
 
   return (
-    <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-      <div className="rounded-lg bg-white p-6 shadow flex flex-col gap-2">
+    <div className="grid grid-cols-1 gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="rounded-lg bg-white p-4 sm:p-6 shadow flex flex-col gap-2">
         <div className="text-xs text-gray-500">Total Employees</div>
         <div className="text-2xl font-bold">{stats.employees}</div>
       </div>
-      <div className="rounded-lg bg-white p-6 shadow flex flex-col gap-2">
+      <div className="rounded-lg bg-white p-4 sm:p-6 shadow flex flex-col gap-2">
         <div className="text-xs text-gray-500">Total Leads</div>
         <div className="text-2xl font-bold">{stats.leads}</div>
       </div>
-      <div className="rounded-lg bg-white p-6 shadow flex flex-col gap-2">
+      <div className="rounded-lg bg-white p-4 sm:p-6 shadow flex flex-col gap-2">
         <div className="text-xs text-gray-500">Total Deals</div>
         <div className="text-2xl font-bold">{stats.deals}</div>
       </div>
-      <div className="rounded-lg bg-white p-6 shadow flex flex-col gap-2">
+      <div className="rounded-lg bg-white p-4 sm:p-6 shadow flex flex-col gap-2">
         <div className="text-xs text-gray-500">Total Opportunities</div>
         <div className="text-2xl font-bold">{stats.opportunities}</div>
       </div>
