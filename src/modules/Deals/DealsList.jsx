@@ -133,12 +133,16 @@ export default function DealsList() {
           <tbody>
             {leads.map((lead) => (
               <tr key={lead.id} className="border-b last:border-b-0 hover:bg-gray-50">
-                <td className="px-4 py-2">{lead.first_name} {lead.last_name}</td>
-                <td className="px-4 py-2">{lead.email}</td>
-                <td className="px-4 py-2">{lead.phone}</td>
-                <td className="px-4 py-2">{lead.company}</td>
-                <td className="px-4 py-2">{lead.service?.name || ''}</td>
-                <td className="px-4 py-2">{lead.status}</td>
+                <td className="px-4 py-2">{lead.first_name || ''} {lead.last_name || ''}</td>
+                <td className="px-4 py-2">{lead.email || '-'}</td>
+                <td className="px-4 py-2">{lead.phone || '-'}</td>
+                <td className="px-4 py-2">{lead.company || '-'}</td>
+                <td className="px-4 py-2">
+                  {lead.service && typeof lead.service === 'object'
+                    ? lead.service.name || '-'
+                    : '-'}
+                </td>
+                <td className="px-4 py-2">{lead.status || '-'}</td>
                 <td className="px-4 py-2 flex gap-2">
                   <button
                     className="bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600"

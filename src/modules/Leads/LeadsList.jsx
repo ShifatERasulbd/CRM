@@ -131,26 +131,49 @@ export default function LeadsList() {
             </tr>
           </thead>
           <tbody>
-            {leads.map((lead) => (
-              <tr key={lead.id} className="border-b last:border-b-0 hover:bg-gray-50">
-                <td className="px-4 py-2">{lead.first_name} {lead.last_name}</td>
-                <td className="px-4 py-2">{lead.email}</td>
-                <td className="px-4 py-2">{lead.phone}</td>
-                <td className="px-4 py-2">{lead.company}</td>
-                <td className="px-4 py-2">{lead.service?.name || ''}</td>
-                <td className="px-4 py-2">{lead.status}</td>
-                <td className="px-4 py-2 flex gap-2">
-                  <button
-                    className="bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600"
-                    onClick={() => handleEdit(lead)}
-                  >Edit</button>
-                  <button
-                    className="bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600"
-                    onClick={() => handleDelete(lead.id)}
-                  >Delete</button>
+            {leads.length === 0 ? (
+              <tr>
+                <td colSpan="7" className="px-4 py-8 text-center text-gray-500">
+                  No leads found. Click "Add Lead" to create your first lead.
                 </td>
               </tr>
-            ))}
+            ) : (
+              leads.map((lead) => (
+                <tr key={lead.id} className="border-b last:border-b-0 hover:bg-gray-50">
+                  <td className="px-4 py-2">
+                    {lead.first_name || ''} {lead.last_name || ''}
+                  </td>
+                  <td className="px-4 py-2">{lead.email || '-'}</td>
+                  <td className="px-4 py-2">{lead.phone || '-'}</td>
+                  <td className="px-4 py-2">{lead.company || '-'}</td>
+                  <td className="px-4 py-2">
+                    {lead.service && typeof lead.service === 'object'
+                      ? lead.service.name || '-'
+                      : '-'}
+                  </td>
+                  <td className="px-4 py-2">
+                    <span className={`px-2 py-1 rounded text-xs ${
+                      lead.status === 'new' ? 'bg-blue-100 text-blue-800' :
+                      lead.status === 'contacted' ? 'bg-yellow-100 text-yellow-800' :
+                      lead.status === 'qualified' ? 'bg-green-100 text-green-800' :
+                      'bg-gray-100 text-gray-800'
+                    }`}>
+                      {lead.status || 'new'}
+                    </span>
+                  </td>
+                  <td className="px-4 py-2 flex gap-2">
+                    <button
+                      className="bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600"
+                      onClick={() => handleEdit(lead)}
+                    >Edit</button>
+                    <button
+                      className="bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600"
+                      onClick={() => handleDelete(lead.id)}
+                    >Delete</button>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

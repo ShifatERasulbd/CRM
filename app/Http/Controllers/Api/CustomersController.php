@@ -41,7 +41,7 @@ class CustomersController extends Controller
             $validated = $request->validate([
                 'first_name' => 'required|string|max:255',
                 'last_name' => 'nullable|string|max:255',
-                'email' => 'nullable|email|max:255|unique:customers,email',
+                'email' => 'nullable|email|max:255|unique:leads,email',
                 'phone' => 'nullable|string|max:255',
                 'company' => 'nullable|string|max:255',
                 'status' => 'nullable|string|max:255',
@@ -50,7 +50,8 @@ class CustomersController extends Controller
                 'created_by' => 'required|integer|exists:users,id',
                 'notes' => 'nullable|string',
             ]);
-            $customer = Customer::create($validated);
+            $validated['status'] = 'customer';
+            $customer = \App\Models\Lead::create($validated);
             return response()->json([
                 'message' => 'Customer created successfully',
                 'data' => $customer
@@ -72,7 +73,9 @@ class CustomersController extends Controller
     public function show(string $id)
     {
         try {
-            $customer = Customer::with('assignedTo', 'createdBy')->findOrFail($id);
+            $customer = \App\Models\Lead::with('assignedTo', 'createdBy')
+                ->where('status', 'customer')
+                ->findOrFail($id);
             return response()->json($customer);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return response()->json([
@@ -90,11 +93,11 @@ class CustomersController extends Controller
     public function update(Request $request, string $id)
     {
         try {
-            $customer = Customer::findOrFail($id);
+            $customer = \App\Models\Lead::where('status', 'customer')->findOrFail($id);
             $validated = $request->validate([
                 'first_name' => 'required|string|max:255',
                 'last_name' => 'nullable|string|max:255',
-                'email' => 'nullable|email|max:255|unique:customers,email,' . $id,
+                'email' => 'nullable|email|max:255|unique:leads,email,' . $id,
                 'phone' => 'nullable|string|max:255',
                 'company' => 'nullable|string|max:255',
                 'status' => 'nullable|string|max:255',
@@ -128,7 +131,7 @@ class CustomersController extends Controller
     public function destroy(string $id)
     {
         try {
-            $customer = Customer::findOrFail($id);
+            $customer = \App\Models\Lead::where('status', 'customer')->findOrFail($id);
             $customer->delete();
             return response()->json([
                 'message' => 'Customer deleted successfully'

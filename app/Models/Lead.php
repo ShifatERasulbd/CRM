@@ -24,6 +24,12 @@ class Lead extends Model
         'is_converted',
         'converted_at',
     ];
+
+    protected $casts = [
+        'is_converted' => 'boolean',
+        'converted_at' => 'datetime',
+    ];
+
     /**
      * Get the service for this lead
      */
@@ -31,11 +37,6 @@ class Lead extends Model
     {
         return $this->belongsTo(Service::class, 'service_id');
     }
-
-    protected $casts = [
-        'is_converted' => 'boolean',
-        'converted_at' => 'datetime',
-    ];
 
     /**
      * Get the user who created this lead

@@ -1,5 +1,4 @@
-- [x] Reimplement ServicePeople module following Employees pattern
-  - [x] Create ServicePeopleForm.jsx component
-  - [x] Create ServicePeopleList.jsx component
-  - [x] Update ServicePeople.jsx to use modular structure
-- [ ] Test CRUD operations for ServicePeople module
+- [ ] Update show method to use Lead model with status 'customer'
+- [ ] Update update method to use Lead model with status 'customer'
+- [ ] Update destroy method to use Lead model with status 'customer'
+- [ ] Update store method to create Lead with status 'customer' and adjust validation
