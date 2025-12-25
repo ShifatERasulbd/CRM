@@ -63,6 +63,7 @@ export default function Sidebar() {
           <Link to="/activities" className="block px-4 py-2 rounded hover:bg-muted" onClick={() => setOpen(false)}>Activities</Link>
           <Link to="/task&followups" className="block px-4 py-2 rounded hover:bg-muted" onClick={() => setOpen(false)}>Task & Followups</Link>
           <Link to="/employees" className="block px-4 py-2 rounded hover:bg-muted" onClick={() => setOpen(false)}>Employees</Link>
+            <Link to="/service-people" className="block px-4 py-2 rounded hover:bg-muted" onClick={() => setOpen(false)}>Service People</Link>
         </nav>
         <div className="p-4 border-t flex flex-col gap-2">
           <span>User Menu</span>

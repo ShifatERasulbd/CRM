@@ -8,6 +8,7 @@ import Oppertunities from "./modules/Oppertunities/oppertunities";
 import Deals from "./modules/Deals/deals";
 import Customers from "./modules/Customers/customers";
 import Services from "./modules/Services/services";
+import ServicePeople from "./modules/ServicePeople/ServicePeople";
 import Activities from "./modules/Activities/activities";
 import TaskFollowups from "./modules/TaskFollowups/taskfollowups";
 import Employees from "./modules/Employees/employees";
@@ -24,6 +25,7 @@ export default function App() {
     "/deals",
     "/customers",
     "/service",
+      "/service-people",
     "/activities",
     "/task&followups",
     "/employees"
@@ -37,6 +39,7 @@ export default function App() {
     "/deals",
     "/customers",
     "/service",
+      "/service-people",
     "/activities",
     "/task&followups",
     "/employees"
@@ -50,8 +53,8 @@ export default function App() {
   return (
     <div className="min-h-screen w-full bg-muted/40 md:flex">
       {showSidebar && <Sidebar />}
-      {/* Add pt-16 to main for mobile burger menu space, and md:pl-64 for desktop sidebar */}
-      <main className={showSidebar ? "p-6 space-y-6 pt-16 md:pt-6 md:pl-64" : "p-6 space-y-6 pt-16 md:pt-6"}>
+      {/* Add pt-16 to main for mobile burger menu space */}
+      <main className={showSidebar ? "p-6 space-y-6 pt-16 md:pt-6" : "p-6 space-y-6 pt-16 md:pt-6"}>
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/dashboard" element={<Dashboard />} />
@@ -60,6 +63,7 @@ export default function App() {
           <Route path="/deals" element={<Deals/>} />
           <Route path="/customers" element={<Customers/>} />
           <Route path="/service" element={<Services/>} />
+            <Route path="/service-people" element={<ServicePeople/>} />
           <Route path="/activities" element={<Activities/>} />
           <Route path="/task&followups" element={<TaskFollowups/>} />
           <Route path="/employees" element={<Employees/>} />

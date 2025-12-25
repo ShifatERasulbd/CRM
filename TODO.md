@@ -1,0 +1,5 @@
+- [x] Reimplement ServicePeople module following Employees pattern
+  - [x] Create ServicePeopleForm.jsx component
+  - [x] Create ServicePeopleList.jsx component
+  - [x] Update ServicePeople.jsx to use modular structure
+- [ ] Test CRUD operations for ServicePeople module

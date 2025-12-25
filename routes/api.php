@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\LeadsController;
 use App\Http\Controllers\Api\AuthController;
 
+use App\Http\Controllers\ServicePersonController;
+
 // Public routes
 Route::post('/login', [AuthController::class, 'login']);
      
@@ -40,5 +42,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
    // Employees resource routes
        Route::apiResource('employees', App\Http\Controllers\Api\EmployeesController::class);
+    // ServicePeople resource routes
+    Route::apiResource('service-people', ServicePersonController::class);
 });
 
