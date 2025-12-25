@@ -21,17 +21,37 @@ export default function CustomersList() {
           setLoading(false);
           return;
         }
-        const res = await axios.get("/api/customers", {
+        // Fetch customers from /api/customers
+        const resCustomers = await axios.get("/api/customers", {
           headers: {
             Authorization: `Bearer ${token}`,
             Accept: "application/json",
           },
         });
-        let customersData = res.data;
+        let customersData = resCustomers.data;
         if (!Array.isArray(customersData)) {
           customersData = [];
         }
-        setCustomers(customersData);
+        // Fetch leads with status 'customers' from /api/leads
+        const resLeads = await axios.get("/api/leads", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+          },
+        });
+        let leadsData = resLeads.data;
+        if (!Array.isArray(leadsData)) {
+          leadsData = [];
+        }
+        const customerLeads = leadsData.filter(lead => lead.status === "customers");
+        // Merge, avoiding duplicates by email (or id if you prefer)
+        const merged = [...customersData];
+        customerLeads.forEach(lead => {
+          if (!merged.some(c => c.email === lead.email)) {
+            merged.push(lead);
+          }
+        });
+        setCustomers(merged);
       } catch (err) {
         if (err.response?.status === 401) {
           setError("You are not authenticated. Please log in again.");

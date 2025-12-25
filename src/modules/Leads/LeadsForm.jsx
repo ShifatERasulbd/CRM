@@ -272,6 +272,8 @@ export default function LeadsForm({ onSuccess, initialData = null, isEdit = fals
             <option value="contracting">Contracting/Pricing</option>
             <option value="contacted">Contacted</option>
             <option value="qualified">Qualified</option>
+            <option value="verified">Verified</option>
+            <option value="customer">Customer</option>
             <option value="lost">Lost</option>
           </select>
           {validationErrors.status && (

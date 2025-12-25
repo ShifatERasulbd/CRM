@@ -9,10 +9,22 @@ use Illuminate\Support\Facades\Log;
 
 class CustomersController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         try {
-            $customers = Customer::with('assignedTo', 'createdBy')->latest()->get();
+            $user = $request->user();
+            if ($user && $user->email === 'test@example.com') {
+                $customers = \App\Models\Lead::with('assignedTo', 'createdBy')
+                    ->where('status', 'customer')
+                    ->latest()
+                    ->get();
+            } else {
+                $customers = \App\Models\Lead::with('assignedTo', 'createdBy')
+                    ->where('status', 'customer')
+                    ->where('assigned_to', $user->id)
+                    ->latest()
+                    ->get();
+            }
             return response()->json($customers);
         } catch (\Exception $e) {
             Log::error('Error fetching customers: ' . $e->getMessage());

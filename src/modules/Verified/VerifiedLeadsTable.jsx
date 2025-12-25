@@ -1,9 +1,8 @@
-
 import React, { useEffect, useState } from "react";
+import LeadsForm from "../Leads/LeadsForm";
 import axios from "axios";
-import LeadsForm from "./LeadsForm";
 
-export default function LeadsList() {
+export default function VerifiedLeadsTable() {
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -12,74 +11,42 @@ export default function LeadsList() {
   const [refresh, setRefresh] = useState(0);
 
   useEffect(() => {
-    const fetchLeads = async () => {
+    const fetchVerifiedLeads = async () => {
       setLoading(true);
       setError(null);
       try {
         const token = localStorage.getItem("token");
-
         if (!token) {
-          setError("You must be logged in to view leads");
+          setError("You must be logged in to view verified leads");
           setLoading(false);
           return;
         }
-
         const res = await axios.get("/api/leads", {
           headers: {
             Authorization: `Bearer ${token}`,
             Accept: "application/json",
           },
         });
-        // Defensive: only set leads if response is an array
         let leadsData = res.data;
         if (!Array.isArray(leadsData)) {
           leadsData = [];
         }
-        setLeads(leadsData);
+        // Filter only verified leads
+        setLeads(leadsData.filter(lead => lead.status === "verified"));
       } catch (err) {
-        console.error("Error fetching leads:", err);
-        if (err.response?.status === 401) {
-          setError("You are not authenticated. Please log in again.");
-          localStorage.removeItem("token");
-          localStorage.removeItem("user");
-        } else {
-          setError(err.response?.data?.message || "Failed to load leads");
-        }
+        setError(err.response?.data?.message || "Failed to load verified leads");
         setLeads([]);
       } finally {
         setLoading(false);
       }
     };
-    fetchLeads();
+    fetchVerifiedLeads();
   }, [refresh]);
-
-  const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this lead?")) return;
-    try {
-      const token = localStorage.getItem("token");
-      await axios.delete(`/api/leads/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: "application/json",
-        },
-      });
-      setRefresh(r => r + 1);
-    } catch (err) {
-      console.error("Error deleting lead:", err);
-      const errorMsg = err.response?.data?.message || "Failed to delete lead";
-      alert(errorMsg);
-    }
-  };
-
-  const handleEdit = (lead) => {
-    setEditLead(lead);
-    setShowEditModal(true);
-  };
 
   if (loading) {
     return (
       <div className="flex justify-center items-center p-8">
-        <div className="text-gray-600">Loading leads...</div>
+        <div className="text-gray-600">Loading verified leads...</div>
       </div>
     );
   }
@@ -92,33 +59,11 @@ export default function LeadsList() {
     );
   }
 
-    // Statistics
-    const totalLeads = leads.length;
-    const statusCounts = leads.reduce((acc, lead) => {
-      acc[lead.status] = (acc[lead.status] || 0) + 1;
-      return acc;
-    }, {});
-
-    return (
-      <div className="mt-8 w-full">
-        <h2 className="text-lg font-semibold mb-2">Leads</h2>
-
-        {/* Statistics Section */}
-        <div className="mb-4 grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-gray-100 rounded p-3 text-center">
-            <div className="text-xs text-gray-500">Total Leads</div>
-            <div className="text-lg font-bold">{totalLeads}</div>
-          </div>
-          {Object.entries(statusCounts).map(([status, count]) => (
-            <div key={status} className="bg-gray-100 rounded p-3 text-center">
-              <div className="text-xs text-gray-500">{status.charAt(0).toUpperCase() + status.slice(1)}</div>
-              <div className="text-lg font-bold">{count}</div>
-            </div>
-          ))}
-        </div>
-
-        <div className="overflow-x-auto rounded-lg shadow bg-white">
-        <table className="w-full text-sm border-collapse">
+  return (
+    <div className="mt-8 max-w-4xl mx-auto">
+      <h2 className="text-lg font-semibold mb-2">Verified Leads</h2>
+      <div className="overflow-x-auto rounded-lg shadow bg-white">
+        <table className="min-w-full text-sm border-collapse">
           <thead>
             <tr className="bg-gray-50">
               <th className="px-4 py-2 text-left font-medium text-gray-700 border-b">Name</th>
@@ -142,19 +87,17 @@ export default function LeadsList() {
                 <td className="px-4 py-2 flex gap-2">
                   <button
                     className="bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600"
-                    onClick={() => handleEdit(lead)}
+                    onClick={() => {
+                      setEditLead(lead);
+                      setShowEditModal(true);
+                    }}
                   >Edit</button>
-                  <button
-                    className="bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600"
-                    onClick={() => handleDelete(lead.id)}
-                  >Delete</button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-
       {showEditModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
           <div className="bg-white rounded-lg shadow-lg p-6 relative w-full max-w-xl">

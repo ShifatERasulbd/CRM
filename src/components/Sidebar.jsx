@@ -58,6 +58,7 @@ export default function Sidebar() {
           <Link to="/leads" className="block px-4 py-2 rounded hover:bg-muted" onClick={() => setOpen(false)}>Leads</Link>
           <Link to="/oppertuinities" className="block px-4 py-2 rounded hover:bg-muted" onClick={() => setOpen(false)}>Oppertunities</Link>
           <Link to="/deals" className="block px-4 py-2 rounded hover:bg-muted" onClick={() => setOpen(false)}>Deals</Link>
+          <Link to="/verified" className="block px-4 py-2 rounded hover:bg-muted" onClick={() => setOpen(false)}>Verified</Link>
           <Link to="/customers" className="block px-4 py-2 rounded hover:bg-muted" onClick={() => setOpen(false)}>Customers</Link>
           <Link to="/service" className="block px-4 py-2 rounded hover:bg-muted" onClick={() => setOpen(false)}>Services</Link>
           <Link to="/activities" className="block px-4 py-2 rounded hover:bg-muted" onClick={() => setOpen(false)}>Activities</Link>

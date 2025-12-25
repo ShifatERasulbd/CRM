@@ -4,6 +4,7 @@ import Sidebar from "./components/Sidebar";
 import Dashboard from "./modules/Dashboard/dashboard";
 import Login from "./components/Login";
 import Leads from "./modules/Leads/leads";
+import Verified from "./modules/Verified/verified";
 import Oppertunities from "./modules/Oppertunities/oppertunities";
 import Deals from "./modules/Deals/deals";
 import Customers from "./modules/Customers/customers";
@@ -21,11 +22,12 @@ export default function App() {
   const showSidebar = [
     "/dashboard",
     "/leads",
+    "/verified",
     "/oppertuinities",
     "/deals",
     "/customers",
     "/service",
-      "/service-people",
+    "/service-people",
     "/activities",
     "/task&followups",
     "/employees"
@@ -35,11 +37,12 @@ export default function App() {
   const protectedRoutes = [
     "/dashboard",
     "/leads",
+    "/verified",
     "/oppertuinities",
     "/deals",
     "/customers",
     "/service",
-      "/service-people",
+    "/service-people",
     "/activities",
     "/task&followups",
     "/employees"
@@ -59,6 +62,7 @@ export default function App() {
           <Route path="/" element={<Login />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/leads" element={<Leads/>} />
+          <Route path="/verified" element={<Verified/>} />
           <Route path="/oppertuinities" element={<Oppertunities/>} />
           <Route path="/deals" element={<Deals/>} />
           <Route path="/customers" element={<Customers/>} />
