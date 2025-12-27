@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import ServicePeopleForm from "./ServicePeopleForm";
+import { useNavigate } from "react-router-dom";
 
 export default function ServicePeopleList() {
+  const navigate = useNavigate();
   const [servicePeople, setServicePeople] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -110,6 +112,10 @@ export default function ServicePeopleList() {
                 <td className="px-4 py-2">{person.emergency_contact_phone}</td>
                 <td className="px-4 py-2">{person.emergency_contact_relation}</td>
                 <td className="px-4 py-2 flex gap-2">
+                  <button
+                    className="bg-green-500 text-white px-2 py-1 rounded text-xs hover:bg-green-600"
+                    onClick={() => navigate(`/service-people/${person.id}`)}
+                  >View</button>
                   <button
                     className="bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600"
                     onClick={() => setEditServicePerson(person)}

@@ -12,6 +12,7 @@ import CustomerDetails from "./modules/Customers/CustomerDetails";
 import LeadDetails from "./modules/Leads/leadDetails";
 import Services from "./modules/Services/services";
 import ServicePeople from "./modules/ServicePeople/ServicePeople";
+import ServicePersonDetails from "./modules/ServicePeople/ServicePersonDetails";
 import Activities from "./modules/Activities/activities";
 import TaskFollowups from "./modules/TaskFollowups/taskfollowups";
 import Employees from "./modules/Employees/employees";
@@ -71,7 +72,8 @@ export default function App() {
           <Route path="/customers/:id" element={<CustomerDetails/>} />
           <Route path="/leads/:id" element={<LeadDetails/>} />
           <Route path="/service" element={<Services/>} />
-            <Route path="/service-people" element={<ServicePeople/>} />
+          <Route path="/service-people" element={<ServicePeople/>} />
+          <Route path="/service-people/:id" element={<ServicePersonDetails />} />
           <Route path="/activities" element={<Activities/>} />
           <Route path="/task&followups" element={<TaskFollowups/>} />
           <Route path="/employees" element={<Employees/>} />

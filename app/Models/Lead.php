@@ -20,6 +20,8 @@ class Lead extends Model
         'service_id',
         'assigned_to',
         'service_person_id',
+        'service_person_joining_date',
+        'service_person_end_date',
         'created_by',
         'notes',
         'is_converted',
@@ -53,5 +55,12 @@ class Lead extends Model
     public function assignedTo()
     {
         return $this->belongsTo(User::class, 'assigned_to');
+    }
+    /**
+     * Get the service person assigned to this lead/customer
+     */
+    public function servicePerson()
+    {
+        return $this->belongsTo(ServicePerson::class, 'service_person_id');
     }
 }

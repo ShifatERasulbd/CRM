@@ -73,7 +73,7 @@ class CustomersController extends Controller
     public function show(string $id)
     {
         try {
-            $customer = \App\Models\Lead::with('assignedTo', 'createdBy')
+            $customer = \App\Models\Lead::with(['assignedTo', 'createdBy', 'servicePerson'])
                 ->where('status', 'customer')
                 ->findOrFail($id);
 
@@ -84,6 +84,7 @@ class CustomersController extends Controller
             }
             $customerArray = $customer->toArray();
             $customerArray['assignedEmployee'] = $employee ? $employee->toArray() : null;
+            $customerArray['servicePerson'] = $customer->servicePerson ? $customer->servicePerson->toArray() : null;
 
             return response()->json($customerArray);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {

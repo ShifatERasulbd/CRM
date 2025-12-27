@@ -95,6 +95,8 @@ class LeadsController extends Controller
                 'service_id' => 'nullable|exists:services,id',
                 'assigned_to' => 'nullable|exists:users,id',
                 'service_person_id' => 'nullable|exists:service_people,id',
+                'service_person_joining_date' => 'nullable|date',
+                'service_person_end_date' => 'nullable|date',
                 'created_by' => 'required|integer|exists:users,id',
                 'notes' => 'nullable|string',
             ]);
@@ -161,6 +163,8 @@ class LeadsController extends Controller
                 'service_id' => 'nullable|exists:services,id',
                 'assigned_to' => 'nullable|exists:users,id',
                 'service_person_id' => 'nullable|exists:service_people,id',
+                'service_person_joining_date' => 'nullable|date',
+                'service_person_end_date' => 'nullable|date',
                 'notes' => 'nullable|string',
             ]);
 

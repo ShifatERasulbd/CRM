@@ -32,6 +32,8 @@ export default function LeadsForm({
       assigned_to: "",
       service_id: "",
       service_person_id: "",
+      service_person_joining_date: initialData?.service_person_joining_date || "",
+      service_person_end_date: initialData?.service_person_end_date || "",
     }
   );
 
@@ -48,6 +50,8 @@ export default function LeadsForm({
         assigned_to: initialData.assigned_to ? String(initialData.assigned_to) : "",
         service_id: initialData.service_id ? String(initialData.service_id) : "",
         service_person_id: initialData.service_person_id ? String(initialData.service_person_id) : "",
+        service_person_joining_date: initialData.service_person_joining_date || "",
+        service_person_end_date: initialData.service_person_end_date || "",
       }));
     }
   }, [initialData]);
@@ -153,11 +157,12 @@ export default function LeadsForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-4 bg-white p-6 rounded-lg shadow max-w-6xl mx-auto"
+      className="space-y-4 bg-white p-6 rounded-lg shadow max-w-7xl mx"
     >
       <h2 className="text-lg font-semibold">
         {isEdit ? "Edit Lead" : "Add Lead"}
       </h2>
+
 
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-2 rounded">
@@ -165,7 +170,9 @@ export default function LeadsForm({
         </div>
       )}
 
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+     
+
+    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                
         <div>
           <label className="block text-sm font-medium mb-1">First Name *</label>
@@ -354,6 +361,34 @@ export default function LeadsForm({
           )}
         </div>
        
+      </div>
+       <div className="md:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium mb-1">Service Person Joining Date</label>
+          <input
+            type="date"
+            name="service_person_joining_date"
+            value={form.service_person_joining_date || ""}
+            onChange={handleChange}
+            className={`w-full border rounded px-3 py-2 ${validationErrors.service_person_joining_date ? 'border-red-500' : ''}`}
+          />
+          {validationErrors.service_person_joining_date && (
+            <p className="text-red-500 text-xs mt-1">{validationErrors.service_person_joining_date[0]}</p>
+          )}
+        </div>
+        <div>
+          <label className="block text-sm font-medium mb-1">Service Person End Date</label>
+          <input
+            type="date"
+            name="service_person_end_date"
+            value={form.service_person_end_date || ""}
+            onChange={handleChange}
+            className={`w-full border rounded px-3 py-2 ${validationErrors.service_person_end_date ? 'border-red-500' : ''}`}
+          />
+          {validationErrors.service_person_end_date && (
+            <p className="text-red-500 text-xs mt-1">{validationErrors.service_person_end_date[0]}</p>
+          )}
+        </div>
       </div>
 
       <button

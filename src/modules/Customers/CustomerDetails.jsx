@@ -140,13 +140,22 @@ export default function CustomerDetails() {
               <>
                 <div>
                   <strong>Name:</strong>{" "}
-                  {customer.servicePerson.name ||
-                    customer.servicePerson.email ||
-                    "-"}
+                  {customer.servicePerson.first_name }{" "}
+                  {customer.servicePerson.last_name}
                 </div>
                 <div>
                   <strong>Email:</strong>{" "}
                   {customer.servicePerson.email || "-"}
+                </div>
+
+                <div>
+                  <strong>Joining Date:</strong>{" "}
+                  {customer.service_person_joining_date || "-"}
+                </div>
+
+                <div>
+                  <strong>End Date:</strong>{" "}
+                  {customer.service_person_end_date || "-"}
                 </div>
               </>
             ) : (

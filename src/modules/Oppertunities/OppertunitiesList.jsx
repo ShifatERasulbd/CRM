@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import LeadsForm from "../Leads/LeadsForm";
+import {useNavigate } from "react-router-dom";
 
 export default function OppertunitiesList() {
   const [oppertunities, setOppertunities] = useState([]);
@@ -10,7 +11,7 @@ export default function OppertunitiesList() {
   const [editLead, setEditLead] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [refresh, setRefresh] = useState(0);
-
+  const navigate = useNavigate();
   useEffect(() => {
     const fetchOppertunities = async () => {
       setLoading(true);
@@ -65,6 +66,10 @@ export default function OppertunitiesList() {
       const errorMsg = err.response?.data?.message || "Failed to delete lead";
       alert(errorMsg);
     }
+  };
+
+  const handleView = (lead) => {
+    navigate(`/leads/${lead.id}`);
   };
 
   const handleEdit = (lead) => {
@@ -136,6 +141,10 @@ export default function OppertunitiesList() {
                 <td className="px-4 py-2">{opp.service?.name || ''}</td>
                 <td className="px-4 py-2">{opp.status}</td>
                 <td className="px-4 py-2 flex gap-2">
+                  <button
+                    className="bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600"
+                    onClick={() => handleView(opp)}
+                  >View</button>
                   <button
                     className="bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600"
                     onClick={() => handleEdit(opp)}

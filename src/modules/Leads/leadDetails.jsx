@@ -13,6 +13,9 @@ const LeadDetails = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("interaction");
   const [showModal, setShowModal] = useState(false);
+  const [interactions, setInteractions] = useState([]);
+  const [interactionsLoading, setInteractionsLoading] = useState(false);
+  const [interactionsError, setInteractionsError] = useState(null);
   const [noteInput, setNoteInput] = useState("");
   const [noteSaving, setNoteSaving] = useState(false);
   const [noteError, setNoteError] = useState(null);
@@ -35,8 +38,29 @@ const LeadDetails = () => {
         setLoading(false);
       }
     };
-    if (id) fetchLead();
-  }, [id]);
+    const fetchInteractions = async () => {
+      setInteractionsLoading(true);
+      setInteractionsError(null);
+      try {
+        const token = localStorage.getItem("token");
+        const res = await axios.get(`/api/interactions?lead_id=${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+          },
+        });
+        setInteractions(res.data);
+      } catch (err) {
+        setInteractionsError(err.response?.data?.message || "Failed to fetch interactions");
+      } finally {
+        setInteractionsLoading(false);
+      }
+    };
+    if (id) {
+      fetchLead();
+      fetchInteractions();
+    }
+  }, [id, showModal]);
 
   if (loading) return <div>Loading lead details...</div>;
   if (error) return <div className="text-red-500">{error}</div>;
@@ -44,7 +68,7 @@ const LeadDetails = () => {
 
   return (
     <>
-      <div className="max-w-2xl mx-auto mt-8 bg-white rounded-lg shadow p-6">
+      <div className="w-full mt-8 bg-white rounded-lg shadow p-6">
       <button
         className="mb-4 px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 text-sm font-semibold"
         onClick={() => navigate(-1)}
@@ -101,6 +125,24 @@ const LeadDetails = () => {
                             </button>
                         </div>
                   {lead.notes}
+                  <div className="mt-4">
+                    <h4 className="font-semibold mb-2">Interactions</h4>
+                    {interactionsLoading && <div>Loading interactions...</div>}
+                    {interactionsError && <div className="text-red-500">{interactionsError}</div>}
+                    {!interactionsLoading && !interactionsError && interactions.length === 0 && (
+                      <div className="text-gray-500">No interactions found.</div>
+                    )}
+                    {!interactionsLoading && !interactionsError && interactions.length > 0 && (
+                      <ul className="space-y-2">
+                        {interactions.map((interaction) => (
+                          <li key={interaction.id} className="border rounded p-2 bg-gray-50">
+                            <div className="text-sm">{interaction.notes}</div>
+                            <div className="text-xs text-gray-400">{interaction.created_at ? new Date(interaction.created_at).toLocaleString() : ''}</div>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
                 </div>
           </div>
         )}
