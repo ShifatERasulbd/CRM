@@ -44,5 +44,8 @@ Route::middleware('auth:sanctum')->group(function () {
        Route::apiResource('employees', App\Http\Controllers\Api\EmployeesController::class);
     // ServicePeople resource routes
     Route::apiResource('service-people', ServicePersonController::class);
+
+    // Interactions store route
+    Route::post('interactions', [\App\Http\Controllers\InteractionController::class, 'store']);
 });
 
