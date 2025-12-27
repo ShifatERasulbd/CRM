@@ -2,8 +2,9 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import LeadsForm from "./LeadsForm";
-
+import { useNavigate } from "react-router-dom";
 export default function LeadsList() {
+  const navigate = useNavigate();
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -69,6 +70,10 @@ export default function LeadsList() {
       const errorMsg = err.response?.data?.message || "Failed to delete lead";
       alert(errorMsg);
     }
+  };
+
+   const handleView = (lead) => {
+    navigate(`/leads/${lead.id}`);
   };
 
   const handleEdit = (lead) => {
@@ -162,6 +167,12 @@ export default function LeadsList() {
                     </span>
                   </td>
                   <td className="px-4 py-2 flex gap-2">
+                     <button
+                    onClick={() => handleView(lead)}
+                    className="bg-blue-500 text-white px-2 py-1 rounded text-xs"
+                  >
+                    View
+                  </button>
                     <button
                       className="bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600"
                       onClick={() => handleEdit(lead)}

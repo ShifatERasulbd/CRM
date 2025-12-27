@@ -9,6 +9,7 @@ import Oppertunities from "./modules/Oppertunities/oppertunities";
 import Deals from "./modules/Deals/deals";
 import Customers from "./modules/Customers/customers";
 import CustomerDetails from "./modules/Customers/CustomerDetails";
+import LeadDetails from "./modules/Leads/leadDetails";
 import Services from "./modules/Services/services";
 import ServicePeople from "./modules/ServicePeople/ServicePeople";
 import Activities from "./modules/Activities/activities";
@@ -68,6 +69,7 @@ export default function App() {
           <Route path="/deals" element={<Deals/>} />
           <Route path="/customers" element={<Customers/>} />
           <Route path="/customers/:id" element={<CustomerDetails/>} />
+          <Route path="/leads/:id" element={<LeadDetails/>} />
           <Route path="/service" element={<Services/>} />
             <Route path="/service-people" element={<ServicePeople/>} />
           <Route path="/activities" element={<Activities/>} />

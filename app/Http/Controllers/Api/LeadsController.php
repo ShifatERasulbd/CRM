@@ -94,6 +94,7 @@ class LeadsController extends Controller
                 'source' => 'nullable|string|max:255',
                 'service_id' => 'nullable|exists:services,id',
                 'assigned_to' => 'nullable|exists:users,id',
+                'service_person_id' => 'nullable|exists:service_people,id',
                 'created_by' => 'required|integer|exists:users,id',
                 'notes' => 'nullable|string',
             ]);
@@ -145,6 +146,7 @@ class LeadsController extends Controller
      */
     public function update(Request $request, string $id)
     {
+      
         try {
             $lead = Lead::findOrFail($id);
 
@@ -158,6 +160,7 @@ class LeadsController extends Controller
                 'source' => 'nullable|string|max:255',
                 'service_id' => 'nullable|exists:services,id',
                 'assigned_to' => 'nullable|exists:users,id',
+                'service_person_id' => 'nullable|exists:service_people,id',
                 'notes' => 'nullable|string',
             ]);
 

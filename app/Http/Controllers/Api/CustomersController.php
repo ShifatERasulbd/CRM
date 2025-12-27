@@ -76,7 +76,16 @@ class CustomersController extends Controller
             $customer = \App\Models\Lead::with('assignedTo', 'createdBy')
                 ->where('status', 'customer')
                 ->findOrFail($id);
-            return response()->json($customer);
+
+            // Fetch assigned employee details from Employee table
+            $employee = null;
+            if ($customer->assigned_to) {
+                $employee = \App\Models\Employee::find($customer->assigned_to);
+            }
+            $customerArray = $customer->toArray();
+            $customerArray['assignedEmployee'] = $employee ? $employee->toArray() : null;
+
+            return response()->json($customerArray);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return response()->json([
                 'message' => 'Customer not found'

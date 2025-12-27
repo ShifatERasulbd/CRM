@@ -19,6 +19,7 @@ class Lead extends Model
         'source',
         'service_id',
         'assigned_to',
+        'service_person_id',
         'created_by',
         'notes',
         'is_converted',
