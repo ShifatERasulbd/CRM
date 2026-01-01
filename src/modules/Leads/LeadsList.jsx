@@ -4,6 +4,7 @@ import axios from "axios";
 import LeadsForm from "./LeadsForm";
 import { useNavigate } from "react-router-dom";
 export default function LeadsList() {
+    const [search, setSearch] = useState("");
   const navigate = useNavigate();
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -107,9 +108,33 @@ export default function LeadsList() {
       return acc;
     }, {});
 
+    // Filter leads by search
+    const filteredLeads = leads.filter(lead => {
+      const searchTerm = search.toLowerCase();
+      return (
+        (lead.first_name && lead.first_name.toLowerCase().includes(searchTerm)) ||
+        (lead.last_name && lead.last_name.toLowerCase().includes(searchTerm)) ||
+        (lead.email && lead.email.toLowerCase().includes(searchTerm)) ||
+        (lead.phone && lead.phone.toLowerCase().includes(searchTerm)) ||
+        (lead.company && lead.company.toLowerCase().includes(searchTerm)) ||
+        (lead.status && lead.status.toLowerCase().includes(searchTerm)) ||
+        (lead.service && typeof lead.service === 'object' && lead.service.name && lead.service.name.toLowerCase().includes(searchTerm))
+      );
+    });
+
     return (
       <div className="mt-8 w-full">
-        <h2 className="text-lg font-semibold mb-2">Leads</h2>
+        {/* Title and Search Bar */}
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold">Leads</h2>
+          <input
+            type="text"
+            placeholder="Search leads..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            className="border rounded px-3 py-2 w-64"
+          />
+        </div>
 
         {/* Statistics Section */}
         <div className="mb-4 grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -139,14 +164,14 @@ export default function LeadsList() {
             </tr>
           </thead>
           <tbody>
-            {leads.length === 0 ? (
+            {filteredLeads.length === 0 ? (
               <tr>
                 <td colSpan="7" className="px-4 py-8 text-center text-gray-500">
                   No leads found. Click "Add Lead" to create your first lead.
                 </td>
               </tr>
             ) : (
-              leads.map((lead) => (
+              filteredLeads.map((lead) => (
                 <tr key={lead.id} className="border-b last:border-b-0 hover:bg-gray-50">
                   <td className="px-4 py-2">
                     {lead.first_name || ''} {lead.last_name || ''}
