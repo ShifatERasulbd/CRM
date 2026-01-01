@@ -59,6 +59,9 @@ export default function VerifiedLeadsTable() {
     );
   }
 
+  // Ensure leads is always an array
+  const safeLeads = Array.isArray(leads) ? leads : [];
+
   return (
     <div className="mt-8 max-w-4xl mx-auto">
       <h2 className="text-lg font-semibold mb-2">Verified Leads</h2>
@@ -76,7 +79,14 @@ export default function VerifiedLeadsTable() {
             </tr>
           </thead>
           <tbody>
-            {leads.map((lead) => (
+            {safeLeads.length === 0 ? (
+              <tr>
+                <td colSpan="7" className="px-4 py-8 text-center text-gray-500">
+                  No verified leads found.
+                </td>
+              </tr>
+            ) : (
+              safeLeads.map((lead) => (
               <tr key={lead.id} className="border-b last:border-b-0 hover:bg-gray-50">
                 <td className="px-4 py-2">{lead.first_name || ''} {lead.last_name || ''}</td>
                 <td className="px-4 py-2">{lead.email || '-'}</td>
@@ -98,7 +108,8 @@ export default function VerifiedLeadsTable() {
                   >Edit</button>
                 </td>
               </tr>
-            ))}
+              ))
+            )}
           </tbody>
         </table>
       </div>

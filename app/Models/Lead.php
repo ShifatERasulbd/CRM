@@ -19,13 +19,12 @@ class Lead extends Model
         'source',
         'service_id',
         'assigned_to',
-        'service_person_id',
-        'service_person_joining_date',
-        'service_person_end_date',
         'created_by',
         'notes',
         'is_converted',
         'converted_at',
+        'reference_by_customer',
+        'reference_by_staff',
     ];
 
     protected $casts = [
@@ -62,5 +61,13 @@ class Lead extends Model
     public function servicePerson()
     {
         return $this->belongsTo(ServicePerson::class, 'service_person_id');
+    }
+
+    /**
+     * Get the lead service people
+     */
+    public function leadServicePeople()
+    {
+        return $this->hasMany(LeadServicePerson::class);
     }
 }

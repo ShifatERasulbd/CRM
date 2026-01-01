@@ -103,6 +103,9 @@ const Customers = () => {
       </div>
     );
 
+  // Ensure customers is always an array
+  const safeCustomers = Array.isArray(customers) ? customers : [];
+
   return (
     <div className="mt-8 max-w-4xl mx-auto">
       <h2 className="text-lg font-semibold mb-3">Customers</h2>
@@ -120,7 +123,14 @@ const Customers = () => {
             </tr>
           </thead>
           <tbody>
-            {customers.map((customer) => (
+            {safeCustomers.length === 0 ? (
+              <tr>
+                <td colSpan="6" className="px-4 py-8 text-center text-gray-500">
+                  No customers found.
+                </td>
+              </tr>
+            ) : (
+              safeCustomers.map((customer) => (
               <tr
                 key={customer.id}
                 className="border-b hover:bg-gray-50"
@@ -153,7 +163,8 @@ const Customers = () => {
                   </button>
                 </td>
               </tr>
-            ))}
+              ))
+            )}
           </tbody>
         </table>
       </div>

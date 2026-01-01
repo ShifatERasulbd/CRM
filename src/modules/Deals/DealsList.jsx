@@ -92,12 +92,14 @@ export default function DealsList() {
     );
   }
 
-    // Statistics
-    const totalLeads = leads.length;
-    const statusCounts = leads.reduce((acc, lead) => {
-      acc[lead.status] = (acc[lead.status] || 0) + 1;
-      return acc;
-    }, {});
+  // Statistics - ensure leads is always an array
+  const safeLeads = Array.isArray(leads) ? leads : [];
+  const totalLeads = safeLeads.length;
+  const statusCounts = safeLeads.reduce((acc, lead) => {
+    const status = lead?.status || 'unknown';
+    acc[status] = (acc[status] || 0) + 1;
+    return acc;
+  }, {});
 
     return (
       <div className="mt-8 max-w-4xl mx-auto">
@@ -131,30 +133,38 @@ export default function DealsList() {
             </tr>
           </thead>
           <tbody>
-            {leads.map((lead) => (
-              <tr key={lead.id} className="border-b last:border-b-0 hover:bg-gray-50">
-                <td className="px-4 py-2">{lead.first_name || ''} {lead.last_name || ''}</td>
-                <td className="px-4 py-2">{lead.email || '-'}</td>
-                <td className="px-4 py-2">{lead.phone || '-'}</td>
-                <td className="px-4 py-2">{lead.company || '-'}</td>
-                <td className="px-4 py-2">
-                  {lead.service && typeof lead.service === 'object'
-                    ? lead.service.name || '-'
-                    : '-'}
-                </td>
-                <td className="px-4 py-2">{lead.status || '-'}</td>
-                <td className="px-4 py-2 flex gap-2">
-                  <button
-                    className="bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600"
-                    onClick={() => handleEdit(lead)}
-                  >Edit</button>
-                  <button
-                    className="bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600"
-                    onClick={() => handleDelete(lead.id)}
-                  >Delete</button>
+            {safeLeads.length === 0 ? (
+              <tr>
+                <td colSpan="7" className="px-4 py-8 text-center text-gray-500">
+                  No deals found.
                 </td>
               </tr>
-            ))}
+            ) : (
+              safeLeads.map((lead) => (
+                <tr key={lead.id} className="border-b last:border-b-0 hover:bg-gray-50">
+                  <td className="px-4 py-2">{lead.first_name || ''} {lead.last_name || ''}</td>
+                  <td className="px-4 py-2">{lead.email || '-'}</td>
+                  <td className="px-4 py-2">{lead.phone || '-'}</td>
+                  <td className="px-4 py-2">{lead.company || '-'}</td>
+                  <td className="px-4 py-2">
+                    {lead.service && typeof lead.service === 'object'
+                      ? lead.service.name || '-'
+                      : '-'}
+                  </td>
+                  <td className="px-4 py-2">{lead.status || '-'}</td>
+                  <td className="px-4 py-2 flex gap-2">
+                    <button
+                      className="bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600"
+                      onClick={() => handleEdit(lead)}
+                    >Edit</button>
+                    <button
+                      className="bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600"
+                      onClick={() => handleDelete(lead.id)}
+                    >Delete</button>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

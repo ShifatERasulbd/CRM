@@ -93,12 +93,14 @@ export default function OppertunitiesList() {
     );
   }
 
-    // Statistics
-    const totalOppertunities = oppertunities.length;
-    const statusCounts = oppertunities.reduce((acc, opp) => {
-      acc[opp.status] = (acc[opp.status] || 0) + 1;
-      return acc;
-    }, {});
+  // Statistics - ensure oppertunities is always an array
+  const safeOppertunities = Array.isArray(oppertunities) ? oppertunities : [];
+  const totalOppertunities = safeOppertunities.length;
+  const statusCounts = safeOppertunities.reduce((acc, opp) => {
+    const status = opp?.status || 'unknown';
+    acc[status] = (acc[status] || 0) + 1;
+    return acc;
+  }, {});
 
     return (
       <div className="mt-8 max-w-4xl mx-auto">
@@ -132,14 +134,25 @@ export default function OppertunitiesList() {
             </tr>
           </thead>
           <tbody>
-            {oppertunities.map((opp) => (
-              <tr key={opp.id} className="border-b last:border-b-0 hover:bg-gray-50">
-                <td className="px-4 py-2">{opp.first_name} {opp.last_name}</td>
-                <td className="px-4 py-2">{opp.email}</td>
-                <td className="px-4 py-2">{opp.phone}</td>
-                <td className="px-4 py-2">{opp.company}</td>
-                <td className="px-4 py-2">{opp.service?.name || ''}</td>
-                <td className="px-4 py-2">{opp.status}</td>
+            {safeOppertunities.length === 0 ? (
+              <tr>
+                <td colSpan="7" className="px-4 py-8 text-center text-gray-500">
+                  No opportunities found.
+                </td>
+              </tr>
+            ) : (
+              safeOppertunities.map((opp) => (
+                <tr key={opp.id} className="border-b last:border-b-0 hover:bg-gray-50">
+                  <td className="px-4 py-2">{opp.first_name || ''} {opp.last_name || ''}</td>
+                  <td className="px-4 py-2">{opp.email || '-'}</td>
+                  <td className="px-4 py-2">{opp.phone || '-'}</td>
+                  <td className="px-4 py-2">{opp.company || '-'}</td>
+                  <td className="px-4 py-2">
+                    {opp.service && typeof opp.service === 'object'
+                      ? opp.service.name || '-'
+                      : '-'}
+                  </td>
+                  <td className="px-4 py-2">{opp.status || '-'}</td>
                 <td className="px-4 py-2 flex gap-2">
                   <button
                     className="bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600"
@@ -155,7 +168,8 @@ export default function OppertunitiesList() {
                   >Delete</button>
                 </td>
               </tr>
-            ))}
+              ))
+            )}
           </tbody>
         </table>
       </div>

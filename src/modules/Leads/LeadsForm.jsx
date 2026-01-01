@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
@@ -19,6 +20,12 @@ export default function LeadsForm({
   const [employeesLoading, setEmployeesLoading] = useState(true);
   const [employeesError, setEmployeesError] = useState(null);
 
+  const [customers, setCustomers] = useState([]);
+  const [customersLoading, setCustomersLoading] = useState(true);
+  const [customersError, setCustomersError] = useState(null);
+
+  const [editData, setEditData] = useState(null);
+
   const [form, setForm] = useState(
     initialData || {
       first_name: "",
@@ -31,9 +38,9 @@ export default function LeadsForm({
       notes: "",
       assigned_to: "",
       service_id: "",
-      service_person_id: "",
-      service_person_joining_date: initialData?.service_person_joining_date || "",
-      service_person_end_date: initialData?.service_person_end_date || "",
+      reference_by_customer: "",
+      reference_by_staff: "",
+      service_person_dates: [{ service_person_id: "", joining_date: "", end_date: "" }],
     }
   );
 
@@ -44,17 +51,74 @@ export default function LeadsForm({
   // ===================== EFFECTS =====================
 
   useEffect(() => {
-    if (initialData) {
+    if (isEdit && initialData && initialData.id) {
+      const fetchEditData = async () => {
+        try {
+          const token = localStorage.getItem("token");
+          const res = await axios.get(`/api/leads/${initialData.id}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          setEditData(res.data);
+        } catch (err) {
+          console.error("Error fetching lead for edit:", err);
+        }
+      };
+      fetchEditData();
+    }
+  }, [isEdit, initialData]);
+
+  useEffect(() => {
+    const data = editData || initialData;
+    if (data) {
+      console.log('Lead data received:', data); // Debug log
+
+      // Support both snake_case and camelCase for API response
+      const lspArr = data.lead_service_people || data.leadServicePeople || [];
+      console.log('Lead service people array:', lspArr); // Debug log
+
+      const servicePersonDates = Array.isArray(lspArr) && lspArr.length > 0
+        ? lspArr.map(lsp => {
+            console.log('Processing LSP:', lsp); // Debug log
+
+            // Format dates properly for HTML date inputs (YYYY-MM-DD)
+            let joiningDate = "";
+            let endDate = "";
+
+            if (lsp.joining_date) {
+              // Handle both string dates and date objects
+              const jd = new Date(lsp.joining_date);
+              if (!isNaN(jd.getTime())) {
+                joiningDate = jd.toISOString().split('T')[0];
+              }
+            }
+
+            if (lsp.end_date) {
+              const ed = new Date(lsp.end_date);
+              if (!isNaN(ed.getTime())) {
+                endDate = ed.toISOString().split('T')[0];
+              }
+            }
+
+            return {
+              service_person_id: lsp.service_person_id ? String(lsp.service_person_id) : "",
+              joining_date: joiningDate,
+              end_date: endDate,
+            };
+          })
+        : [{ service_person_id: "", joining_date: "", end_date: "" }];
+
+      console.log('Formatted service person dates:', servicePersonDates); // Debug log
+
       setForm(f => ({
-        ...initialData,
-        assigned_to: initialData.assigned_to ? String(initialData.assigned_to) : "",
-        service_id: initialData.service_id ? String(initialData.service_id) : "",
-        service_person_id: initialData.service_person_id ? String(initialData.service_person_id) : "",
-        service_person_joining_date: initialData.service_person_joining_date || "",
-        service_person_end_date: initialData.service_person_end_date || "",
+        ...f,
+        ...data,
+        assigned_to: data.assigned_to ? String(data.assigned_to) : "",
+        service_id: data.service_id ? String(data.service_id) : "",
+        reference_by_customer: data.reference_by_customer ? String(data.reference_by_customer) : "",
+        service_person_dates: servicePersonDates,
       }));
     }
-  }, [initialData]);
+  }, [initialData, editData]);
 
   useEffect(() => {
     const fetchServicePeople = async () => {
@@ -107,12 +171,52 @@ export default function LeadsForm({
     fetchServices();
   }, []);
 
+  useEffect(() => {
+    const fetchCustomers = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await axios.get("/api/leads?status=customer", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setCustomers(Array.isArray(res.data) ? res.data : []);
+      } catch {
+        setCustomersError("Failed to load customers");
+      } finally {
+        setCustomersLoading(false);
+      }
+    };
+    fetchCustomers();
+  }, []);
+
   // ===================== HANDLERS =====================
 
   function handleChange(e) {
     setForm({ ...form, [e.target.name]: e.target.value });
     if (validationErrors[e.target.name]) {
       setValidationErrors({ ...validationErrors, [e.target.name]: null });
+    }
+  }
+
+  function handleDateChange(index, field, value) {
+    const updatedDates = [...form.service_person_dates];
+    updatedDates[index][field] = value;
+    setForm({ ...form, service_person_dates: updatedDates });
+    if (validationErrors[`service_person_dates.${index}.${field}`]) {
+      setValidationErrors({ ...validationErrors, [`service_person_dates.${index}.${field}`]: null });
+    }
+  }
+
+  function addDatePair() {
+    setForm({
+      ...form,
+      service_person_dates: [...form.service_person_dates, { service_person_id: "", joining_date: "", end_date: "" }]
+    });
+  }
+
+  function removeDatePair(index) {
+    if (form.service_person_dates.length > 1) {
+      const updatedDates = form.service_person_dates.filter((_, i) => i !== index);
+      setForm({ ...form, service_person_dates: updatedDates });
     }
   }
 
@@ -272,7 +376,7 @@ export default function LeadsForm({
             >
               <option value="">Select employee</option>
               {employees.map(emp => (
-                <option key={emp.id} value={emp.id}>{emp.first_name} {emp.last_name}</option>
+                <option key={emp.id} value={String(emp.id)}>{emp.first_name} {emp.last_name}</option>
               ))}
             </select>
           )}
@@ -314,7 +418,7 @@ export default function LeadsForm({
               >
                 <option value="">Select a service</option>
                 {services.map(service => (
-                  <option key={service.id} value={service.id}>{service.name}</option>
+                  <option key={service.id} value={String(service.id)}>{service.name}</option>
                 ))}
               </select>
             )}
@@ -322,32 +426,45 @@ export default function LeadsForm({
               <p className="text-red-500 text-xs mt-1">{validationErrors.service_id[0]}</p>
             )}
           </div>
-       
-        <div>
-          <label className="block text-sm font-medium mb-1">Service Person</label>
-          {servicePeopleLoading ? (
-            <div className="text-gray-500 text-xs">Loading service people...</div>
-          ) : servicePeopleError ? (
-            <div className="text-red-500 text-xs">{servicePeopleError}</div>
-          ) : (
-            <select
-              name="service_person_id"
-              value={form.service_person_id || ""}
-              onChange={handleChange}
-              className={`w-full border rounded px-3 py-2 ${validationErrors.service_person_id ? 'border-red-500' : ''}`}
-            >
-              <option value="">Select service person</option>
-              {servicePeople.map(sp => (
-                <option key={sp.id} value={sp.id}>{sp.first_name} {sp.last_name}</option>
-              ))}
-            </select>
-          )}
-          {validationErrors.service_person_id && (
-            <p className="text-red-500 text-xs mt-1">{validationErrors.service_person_id[0]}</p>
-          )}
-        </div>
 
-        <div className="md:col-span-3">
+          <div>
+            <label className="block text-sm font-medium mb-1">Reference By Customer</label>
+            {customersLoading ? (
+              <div className="text-gray-500 text-xs">Loading customers...</div>
+            ) : customersError ? (
+              <div className="text-red-500 text-xs">{customersError}</div>
+            ) : (
+              <select
+                name="reference_by_customer"
+                value={form.reference_by_customer || ""}
+                onChange={handleChange}
+                className={`w-full border rounded px-3 py-2 ${validationErrors.reference_by_customer ? 'border-red-500' : ''}`}
+              >
+                <option value="">Select customer</option>
+                {customers.map(customer => (
+                  <option key={customer.id} value={String(customer.id)}>{customer.first_name} {customer.last_name}</option>
+                ))}
+              </select>
+            )}
+            {validationErrors.reference_by_customer && (
+              <p className="text-red-500 text-xs mt-1">{validationErrors.reference_by_customer[0]}</p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1">Reference By Staff</label>
+            <input
+              name="reference_by_staff"
+              value={form.reference_by_staff}
+              onChange={handleChange}
+              className={`w-full border rounded px-3 py-2 ${validationErrors.reference_by_staff ? 'border-red-500' : ''}`}
+            />
+            {validationErrors.reference_by_staff && (
+              <p className="text-red-500 text-xs mt-1">{validationErrors.reference_by_staff[0]}</p>
+            )}
+          </div>
+
+        <div className="md:col-span-5">
           <label className="block text-sm font-medium mb-1">Notes</label>
           <textarea
             name="notes"
@@ -362,33 +479,81 @@ export default function LeadsForm({
         </div>
        
       </div>
-       <div className="md:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium mb-1">Service Person Joining Date</label>
-          <input
-            type="date"
-            name="service_person_joining_date"
-            value={form.service_person_joining_date || ""}
-            onChange={handleChange}
-            className={`w-full border rounded px-3 py-2 ${validationErrors.service_person_joining_date ? 'border-red-500' : ''}`}
-          />
-          {validationErrors.service_person_joining_date && (
-            <p className="text-red-500 text-xs mt-1">{validationErrors.service_person_joining_date[0]}</p>
-          )}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="text-md font-medium">Service Person Dates</h3>
+          <button
+            type="button"
+            onClick={addDatePair}
+            className="bg-blue-500 text-white px-3 py-1 rounded text-sm"
+          >
+            Add Date Pair
+          </button>
         </div>
-        <div>
-          <label className="block text-sm font-medium mb-1">Service Person End Date</label>
-          <input
-            type="date"
-            name="service_person_end_date"
-            value={form.service_person_end_date || ""}
-            onChange={handleChange}
-            className={`w-full border rounded px-3 py-2 ${validationErrors.service_person_end_date ? 'border-red-500' : ''}`}
-          />
-          {validationErrors.service_person_end_date && (
-            <p className="text-red-500 text-xs mt-1">{validationErrors.service_person_end_date[0]}</p>
-          )}
-        </div>
+        {(Array.isArray(form.service_person_dates) ? form.service_person_dates : []).map((datePair, index) => (
+          <div key={index} className="border rounded p-4 bg-gray-50">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-medium">Date Pair {index + 1}</span>
+              {form.service_person_dates.length > 1 && (
+                <button
+                  type="button"
+                  onClick={() => removeDatePair(index)}
+                  className="bg-red-500 text-white px-2 py-1 rounded text-xs"
+                >
+                  Remove
+                </button>
+              )}
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">Service Person</label>
+                {servicePeopleLoading ? (
+                  <div className="text-gray-500 text-xs">Loading service people...</div>
+                ) : servicePeopleError ? (
+                  <div className="text-red-500 text-xs">{servicePeopleError}</div>
+                ) : (
+                  <select
+                    value={datePair.service_person_id || ""}
+                    onChange={(e) => handleDateChange(index, 'service_person_id', e.target.value)}
+                    className={`w-full border rounded px-3 py-2 ${validationErrors[`service_person_dates.${index}.service_person_id`] ? 'border-red-500' : ''}`}
+                  >
+                    <option value="">Select service person</option>
+                    {servicePeople.map(sp => (
+                      <option key={sp.id} value={String(sp.id)}>{sp.first_name} {sp.last_name}</option>
+                    ))}
+                  </select>
+                )}
+                {validationErrors[`service_person_dates.${index}.service_person_id`] && (
+                  <p className="text-red-500 text-xs mt-1">{validationErrors[`service_person_dates.${index}.service_person_id`][0]}</p>
+                )}
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Joining Date</label>
+                <input
+                  type="date"
+                  value={datePair.joining_date || ""}
+                  onChange={(e) => handleDateChange(index, 'joining_date', e.target.value)}
+                  className={`w-full border rounded px-3 py-2 ${validationErrors[`service_person_dates.${index}.joining_date`] ? 'border-red-500' : ''}`}
+                />
+                {validationErrors[`service_person_dates.${index}.joining_date`] && (
+                  <p className="text-red-500 text-xs mt-1">{validationErrors[`service_person_dates.${index}.joining_date`][0]}</p>
+                )}
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">End Date</label>
+                <input
+                  type="date"
+                  value={datePair.end_date || ""}
+                  onChange={(e) => handleDateChange(index, 'end_date', e.target.value)}
+                  className={`w-full border rounded px-3 py-2 ${validationErrors[`service_person_dates.${index}.end_date`] ? 'border-red-500' : ''}`}
+                />
+                {validationErrors[`service_person_dates.${index}.end_date`] && (
+                  <p className="text-red-500 text-xs mt-1">{validationErrors[`service_person_dates.${index}.end_date`][0]}</p>
+                )}
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
 
       <button
