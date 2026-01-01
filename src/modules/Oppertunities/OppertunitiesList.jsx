@@ -11,6 +11,7 @@ export default function OppertunitiesList() {
   const [editLead, setEditLead] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [refresh, setRefresh] = useState(0);
+  const [search, setSearch] = useState("");
   const navigate = useNavigate();
   useEffect(() => {
     const fetchOppertunities = async () => {
@@ -72,8 +73,9 @@ export default function OppertunitiesList() {
     navigate(`/leads/${lead.id}`);
   };
 
-  const handleEdit = (lead) => {
-    setEditLead(lead);
+  // When editing an opportunity, load the lead edit modal (LeadsForm)
+  const handleEdit = (opportunity) => {
+    setEditLead(opportunity);
     setShowEditModal(true);
   };
 
@@ -102,25 +104,49 @@ export default function OppertunitiesList() {
     return acc;
   }, {});
 
+  // Filter opportunities by search
+  const filteredOppertunities = safeOppertunities.filter(opp => {
+    const searchTerm = search.toLowerCase();
     return (
-      <div className="mt-8 max-w-4xl mx-auto">
-        <h2 className="text-lg font-semibold mb-2">Oppertunities</h2>
+      (opp.first_name && opp.first_name.toLowerCase().includes(searchTerm)) ||
+      (opp.last_name && opp.last_name.toLowerCase().includes(searchTerm)) ||
+      (opp.email && opp.email.toLowerCase().includes(searchTerm)) ||
+      (opp.phone && opp.phone.toLowerCase().includes(searchTerm)) ||
+      (opp.company && opp.company.toLowerCase().includes(searchTerm)) ||
+      (opp.status && opp.status.toLowerCase().includes(searchTerm)) ||
+      (opp.service && typeof opp.service === 'object' && opp.service.name && opp.service.name.toLowerCase().includes(searchTerm))
+    );
+  });
 
-        {/* Statistics Section */}
-        <div className="mb-4 grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-gray-100 rounded p-3 text-center">
-            <div className="text-xs text-gray-500">Total Oppertunities</div>
-            <div className="text-lg font-bold">{totalOppertunities}</div>
-          </div>
-          {Object.entries(statusCounts).map(([status, count]) => (
-            <div key={status} className="bg-gray-100 rounded p-3 text-center">
-              <div className="text-xs text-gray-500">{status.charAt(0).toUpperCase() + status.slice(1)}</div>
-              <div className="text-lg font-bold">{count}</div>
-            </div>
-          ))}
+  return (
+    <div className="mt-8 max-w-4xl mx-auto">
+      {/* Title and Search Bar */}
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-lg font-semibold">Oppertunities</h2>
+        <input
+          type="text"
+          placeholder="Search opportunities..."
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          className="border rounded px-3 py-2 w-64"
+        />
+      </div>
+
+      {/* Statistics Section */}
+      <div className="mb-4 grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="bg-gray-100 rounded p-3 text-center">
+          <div className="text-xs text-gray-500">Total Oppertunities</div>
+          <div className="text-lg font-bold">{totalOppertunities}</div>
         </div>
+        {Object.entries(statusCounts).map(([status, count]) => (
+          <div key={status} className="bg-gray-100 rounded p-3 text-center">
+            <div className="text-xs text-gray-500">{status.charAt(0).toUpperCase() + status.slice(1)}</div>
+            <div className="text-lg font-bold">{count}</div>
+          </div>
+        ))}
+      </div>
 
-          <div className="overflow-x-auto rounded-lg shadow bg-white">
+      <div className="overflow-x-auto rounded-lg shadow bg-white">
         <table className="min-w-full text-sm border-collapse">
           <thead>
             <tr className="bg-gray-50">
@@ -134,14 +160,14 @@ export default function OppertunitiesList() {
             </tr>
           </thead>
           <tbody>
-            {safeOppertunities.length === 0 ? (
+            {filteredOppertunities.length === 0 ? (
               <tr>
                 <td colSpan="7" className="px-4 py-8 text-center text-gray-500">
                   No opportunities found.
                 </td>
               </tr>
             ) : (
-              safeOppertunities.map((opp) => (
+              filteredOppertunities.map((opp) => (
                 <tr key={opp.id} className="border-b last:border-b-0 hover:bg-gray-50">
                   <td className="px-4 py-2">{opp.first_name || ''} {opp.last_name || ''}</td>
                   <td className="px-4 py-2">{opp.email || '-'}</td>
@@ -153,21 +179,21 @@ export default function OppertunitiesList() {
                       : '-'}
                   </td>
                   <td className="px-4 py-2">{opp.status || '-'}</td>
-                <td className="px-4 py-2 flex gap-2">
-                  <button
-                    className="bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600"
-                    onClick={() => handleView(opp)}
-                  >View</button>
-                  <button
-                    className="bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600"
-                    onClick={() => handleEdit(opp)}
-                  >Edit</button>
-                  <button
-                    className="bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600"
-                    onClick={() => handleDelete(opp.id)}
-                  >Delete</button>
-                </td>
-              </tr>
+                  <td className="px-4 py-2 flex gap-2">
+                    <button
+                      className="bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600"
+                      onClick={() => handleView(opp)}
+                    >View</button>
+                    <button
+                      className="bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600"
+                      onClick={() => handleEdit(opp)}
+                    >Edit</button>
+                    <button
+                      className="bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600"
+                      onClick={() => handleDelete(opp.id)}
+                    >Delete</button>
+                  </td>
+                </tr>
               ))
             )}
           </tbody>
@@ -175,25 +201,25 @@ export default function OppertunitiesList() {
       </div>
 
       {showEditModal && (
-           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-             <div className="bg-white rounded-lg shadow-lg p-6 relative w-full max-w-xl">
-               <button
-                 className="absolute top-2 right-2 text-gray-500 hover:text-black text-xl"
-                 onClick={() => setShowEditModal(false)}
-               >
-                 &times;
-               </button>
-               <LeadsForm
-                 initialData={editLead}
-                 onSuccess={() => {
-                   setShowEditModal(false);
-                   setRefresh(r => r + 1);
-                 }}
-                 isEdit={true}
-               />
-             </div>
-           </div>
-         )}
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white rounded-lg shadow-lg p-6 relative w-full max-w-4xl overflow-y-auto max-h-screen">
+            <button
+              className="absolute top-2 right-2 text-gray-500 hover:text-black text-xl"
+              onClick={() => setShowEditModal(false)}
+            >
+              &times;
+            </button>
+            <LeadsForm
+              initialData={editLead}
+              onSuccess={() => {
+                setShowEditModal(false);
+                setRefresh(r => r + 1);
+              }}
+              isEdit={true}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
