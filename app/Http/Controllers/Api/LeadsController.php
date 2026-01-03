@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Lead;
 use App\Models\LeadServicePerson;
 use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
 
 class LeadsController extends Controller
 {
@@ -253,6 +254,55 @@ class LeadsController extends Controller
             Log::error('Error deleting lead: ' . $e->getMessage());
             return response()->json([
                 'message' => 'Error deleting lead',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Get lead service people by lead_id
+     */
+    public function getLeadServicePeople(Request $request)
+    {
+        try {
+            $leadId = $request->query('lead_id');
+
+            if (!$leadId) {
+                return response()->json(['message' => 'lead_id parameter is required'], 400);
+            }
+
+            $leadServicePeople = LeadServicePerson::with('servicePerson')
+                ->where('lead_id', $leadId)
+                ->get()
+                ->map(function ($lsp) {
+                    $dutyDays = null;
+                    if ($lsp->joining_date && $lsp->end_date) {
+                        $joiningDate = Carbon::parse($lsp->joining_date);
+                        $endDate = Carbon::parse($lsp->end_date);
+                        $dutyDays = $joiningDate->diffInDays($endDate) + 1; // +1 to include both start and end dates
+                    }
+
+                    return [
+                        'id' => $lsp->id,
+                        'lead_id' => $lsp->lead_id,
+                        'service_person_id' => $lsp->service_person_id,
+                        'joining_date' => $lsp->joining_date,
+                        'end_date' => $lsp->end_date,
+                        'duty_days' => $dutyDays,
+                        'first_name' => $lsp->servicePerson->first_name ?? null,
+                        'last_name' => $lsp->servicePerson->last_name ?? null,
+                        'email' => $lsp->servicePerson->email ?? null,
+                        'phone' => $lsp->servicePerson->phone ?? null,
+                        'joining_date_sp' => $lsp->servicePerson->joining_date ?? null,
+                        'end_date_sp' => $lsp->servicePerson->end_date ?? null,
+                    ];
+                });
+
+            return response()->json($leadServicePeople);
+        } catch (\Exception $e) {
+            Log::error('Error fetching lead service people: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Error fetching lead service people',
                 'error' => $e->getMessage()
             ], 500);
         }

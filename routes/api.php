@@ -48,5 +48,8 @@ Route::middleware('auth:sanctum')->group(function () {
     // Interactions routes
     Route::get('interactions', [\App\Http\Controllers\InteractionController::class, 'index']);
     Route::post('interactions', [\App\Http\Controllers\InteractionController::class, 'store']);
+
+    // Lead service people route
+    Route::get('lead-service-people', [LeadsController::class, 'getLeadServicePeople']);
 });
 

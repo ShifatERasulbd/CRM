@@ -10,7 +10,33 @@ export default function CustomerDetails() {
   const [customer, setCustomer] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [servicePeople, setServicePeople] = useState([]);
+const dateDiffDetailed = (start, end) => {
+    if (!start || !end) return "-";
 
+    let startDate = new Date(start);
+    let endDate = new Date(end);
+
+    let years = endDate.getFullYear() - startDate.getFullYear();
+    let months = endDate.getMonth() - startDate.getMonth();
+    let days = endDate.getDate() - startDate.getDate();
+
+    if (days < 0) {
+        months--;
+        days += new Date(
+            endDate.getFullYear(),
+            endDate.getMonth(),
+            0
+        ).getDate();
+    }
+
+    if (months < 0) {
+        years--;
+        months += 12;
+    }
+
+    return `${years}y ${months}m ${days}d`;
+};
   useEffect(() => {
     const fetchCustomer = async () => {
       setLoading(true);
@@ -34,6 +60,27 @@ export default function CustomerDetails() {
     };
 
     fetchCustomer();
+  }, [id]);
+
+  // Fetch service man details from lead_service_people table where lead_id = id
+  useEffect(() => {
+    const fetchServicePeople = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        // Assuming you have an API endpoint to get service people by lead id
+        const res = await axios.get(`/api/lead-service-people?lead_id=${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+          },
+        });
+        setServicePeople(Array.isArray(res.data) ? res.data : []);
+      } catch (err) {
+        // Optionally handle error
+        setServicePeople([]);
+      }
+    };
+    if (id) fetchServicePeople();
   }, [id]);
 
   if (loading) return <div>Loading customer details...</div>;
@@ -136,27 +183,27 @@ export default function CustomerDetails() {
 
         {activeTab === "serviceman" && (
           <div>
-            {customer.servicePerson ? (
+            {servicePeople.length > 0 ? (
               <>
-                <div>
-                  <strong>Name:</strong>{" "}
-                  {customer.servicePerson.first_name }{" "}
-                  {customer.servicePerson.last_name}
-                </div>
-                <div>
-                  <strong>Email:</strong>{" "}
-                  {customer.servicePerson.email || "-"}
-                </div>
-
-                <div>
-                  <strong>Joining Date:</strong>{" "}
-                  {customer.service_person_joining_date || "-"}
-                </div>
-
-                <div>
-                  <strong>End Date:</strong>{" "}
-                  {customer.service_person_end_date || "-"}
-                </div>
+                {servicePeople.map((sp, idx) => (
+                  <div key={sp.id || idx} className="mb-4 p-3 border rounded">
+                    <div>
+                      <strong>Name:</strong> {sp.first_name} {sp.last_name}
+                    </div>
+                    <div>
+                      <strong>Email:</strong> {sp.email || "-"}
+                    </div>
+                    <div>
+                      <strong>Joining Date:</strong> {sp.joining_date || "-"}
+                    </div>
+                    <div>
+                      <strong>End Date:</strong> {sp.end_date || "-"}
+                    </div>
+                    <div>
+                      <strong>Duty Days:</strong> {dateDiffDetailed(sp.joining_date, sp.end_date)}
+                    </div>
+                  </div>
+                ))}
               </>
             ) : (
               <div>No serviceman assigned.</div>
