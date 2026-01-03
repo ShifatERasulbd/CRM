@@ -2,13 +2,14 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import CustomersForm from "./CustomersForm";
+import LeadsForm from "../Leads/LeadsForm";
 
 const Customers = () => {
   const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [editCustomer, setEditCustomer] = useState(null);
-  const [showEditModal, setShowEditModal] = useState(false);
+  const [showLeadsEditModal, setShowLeadsEditModal] = useState(false);
   const [refresh, setRefresh] = useState(0);
 
   const navigate = useNavigate();
@@ -87,7 +88,7 @@ const Customers = () => {
 
   const handleEdit = (customer) => {
     setEditCustomer(customer);
-    setShowEditModal(true);
+    setShowLeadsEditModal(true);
   };
 
   const handleView = (customer) => {
@@ -169,21 +170,20 @@ const Customers = () => {
         </table>
       </div>
 
-      {showEditModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-white p-6 rounded-lg w-full max-w-xl relative">
+      {showLeadsEditModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white rounded-lg shadow-lg p-6 relative w-full max-w-5xl overflow-y-auto" style={{ maxHeight: '90vh' }}>
             <button
-              className="absolute top-2 right-3 text-xl"
-              onClick={() => setShowEditModal(false)}
+              className="absolute top-2 right-2 text-gray-500 hover:text-black text-xl"
+              onClick={() => setShowLeadsEditModal(false)}
             >
-              ×
+              &times;
             </button>
-
-            <CustomersForm
+            <LeadsForm
               initialData={editCustomer}
-              isEdit
+              isEdit={true}
               onSuccess={() => {
-                setShowEditModal(false);
+                setShowLeadsEditModal(false);
                 setRefresh((r) => r + 1);
               }}
             />
