@@ -18,6 +18,7 @@ import Activities from "./modules/Activities/activities";
 import TaskFollowups from "./modules/TaskFollowups/taskfollowups";
 import Employees from "./modules/Employees/employees";
 import { useAuth } from "./AuthContext";
+import Reports from "./modules/Reports/Reports";
 
 export default function App() {
   const location = useLocation();
@@ -34,7 +35,8 @@ export default function App() {
     "/service-people",
     "/activities",
     "/task&followups",
-    "/employees"
+    "/employees",
+    "/reports"
   ].includes(location.pathname);
 
   // List of protected routes
@@ -49,7 +51,8 @@ export default function App() {
     "/service-people",
     "/activities",
     "/task&followups",
-    "/employees"
+    "/employees",
+    "/reports"
   ];
 
   // If not authenticated and not loading, redirect to login for protected routes
@@ -79,6 +82,7 @@ export default function App() {
           <Route path="/activities" element={<Activities/>} />
           <Route path="/task&followups" element={<TaskFollowups/>} />
           <Route path="/employees" element={<Employees/>} />
+          <Route path="/reports" element={<Reports />} />
         </Routes>
       </main>
     </div>

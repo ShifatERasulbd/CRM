@@ -12,6 +12,61 @@ use Carbon\Carbon;
 class LeadsController extends Controller
 {
     /**
+     * Get leads summary for reports (total, converted, lost, conversion %, loss %, date and status filtering)
+     */
+    public function leadsSummary(Request $request)
+    {
+        try {
+            $user = $request->user();
+            $from = $request->query('from');
+            $to = $request->query('to');
+            $status = $request->query('status');
+
+            $query = Lead::query();
+
+            // Apply user filter
+            if (!$user || $user->email !== 'test@example.com') {
+                if ($user) {
+                    $query->where('assigned_to', $user->id);
+                }
+            }
+
+            // Apply date range filters
+            if ($from) {
+                $query->whereDate('created_at', '>=', $from);
+            }
+            if ($to) {
+                $query->whereDate('created_at', '<=', $to);
+            }
+
+            // Apply status filter
+            if ($status) {
+                $query->where('status', $status);
+            }
+
+            $total = (clone $query)->count();
+            $converted = (clone $query)->where('status', 'customer')->count();
+            $lost = (clone $query)->where('status', 'lost')->count();
+
+            $conversionRate = $total > 0 ? round(($converted / $total) * 100, 2) : 0;
+            $lossRate = $total > 0 ? round(($lost / $total) * 100, 2) : 0;
+
+            return response()->json([
+                'total' => $total,
+                'converted' => $converted,
+                'lost' => $lost,
+                'conversion_rate' => $conversionRate,
+                'loss_rate' => $lossRate,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error fetching leads summary: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Error fetching leads summary',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+    /**
      * Return leads count per day for the last N days (for dashboard graph)
      */
     public function graph(Request $request)
@@ -70,16 +125,36 @@ class LeadsController extends Controller
         try {
             $user = $request->user();
 
+            // Get filter parameters
+            $from = $request->query('from');
+            $to = $request->query('to');
+            $status = $request->query('status');
+
+            // Build base query
+            $query = Lead::with('assignedTo', 'createdBy', 'leadServicePeople.servicePerson');
+
+            // Apply user filter
             if ($user && $user->email === 'test@example.com') {
-                $leads = Lead::with('assignedTo', 'createdBy', 'leadServicePeople.servicePerson')
-                    ->latest()
-                    ->get();
+                // Admin sees all leads
             } else {
-                $leads = Lead::with('assignedTo', 'createdBy', 'leadServicePeople.servicePerson')
-                    ->where('assigned_to', $user?->id)
-                    ->latest()
-                    ->get();
+                // Regular users see only their assigned leads
+                $query->where('assigned_to', $user?->id);
             }
+
+            // Apply date range filters
+            if ($from) {
+                $query->whereDate('created_at', '>=', $from);
+            }
+            if ($to) {
+                $query->whereDate('created_at', '<=', $to);
+            }
+
+            // Apply status filter
+            if ($status) {
+                $query->where('status', $status);
+            }
+
+            $leads = $query->latest()->get();
 
             return response()->json($leads);
         } catch (\Exception $e) {
@@ -271,6 +346,7 @@ class LeadsController extends Controller
                 return response()->json(['message' => 'lead_id parameter is required'], 400);
             }
 
+
             $leadServicePeople = LeadServicePerson::with('servicePerson')
                 ->where('lead_id', $leadId)
                 ->get()
@@ -295,6 +371,7 @@ class LeadsController extends Controller
                         'phone' => $lsp->servicePerson->phone ?? null,
                         'joining_date_sp' => $lsp->servicePerson->joining_date ?? null,
                         'end_date_sp' => $lsp->servicePerson->end_date ?? null,
+                        'salary' => $lsp->servicePerson->salary ?? null,
                     ];
                 });
 

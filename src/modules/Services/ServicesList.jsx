@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import ServicesForm from "./ServicesForm";
+import { DataTable } from "../../components/ui/data-table";
 
 export default function ServicesList() {
   const [services, setServices] = useState([]);
@@ -69,39 +70,46 @@ export default function ServicesList() {
   if (loading) return <div>Loading services...</div>;
   if (error) return <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">{error}</div>;
 
+  // DataTable columns
+  const columns = [
+    {
+      accessorKey: "name",
+      header: "Name",
+      cell: ({ row }) => row.original.name,
+    },
+    {
+      accessorKey: "price",
+      header: "Price",
+      cell: ({ row }) => row.original.price,
+    },
+    {
+      accessorKey: "status",
+      header: "Status",
+      cell: ({ row }) => row.original.status,
+    },
+    {
+      id: "actions",
+      header: "Actions",
+      cell: ({ row }) => (
+        <div className="flex gap-2">
+          <button
+            className="bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600"
+            onClick={() => handleEdit(row.original)}
+          >Edit</button>
+          <button
+            className="bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600"
+            onClick={() => handleDelete(row.original.id)}
+          >Delete</button>
+        </div>
+      ),
+    },
+  ];
+
   return (
     <div className="mt-8 max-w-4xl mx-auto">
       <h2 className="text-lg font-semibold mb-2">Services</h2>
       <div className="overflow-x-auto rounded-lg shadow bg-white">
-        <table className="min-w-full text-sm border-collapse">
-          <thead>
-            <tr className="bg-gray-50">
-              <th className="px-4 py-2 text-left font-medium text-gray-700 border-b">Name</th>
-              <th className="px-4 py-2 text-left font-medium text-gray-700 border-b">Price</th>
-              <th className="px-4 py-2 text-left font-medium text-gray-700 border-b">Status</th>
-              <th className="px-4 py-2 text-left font-medium text-gray-700 border-b">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {services.map((service) => (
-              <tr key={service.id} className="border-b last:border-b-0 hover:bg-gray-50">
-                <td className="px-4 py-2">{service.name}</td>
-                <td className="px-4 py-2">{service.price}</td>
-                <td className="px-4 py-2">{service.status}</td>
-                <td className="px-4 py-2 flex gap-2">
-                  <button
-                    className="bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600"
-                    onClick={() => handleEdit(service)}
-                  >Edit</button>
-                  <button
-                    className="bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600"
-                    onClick={() => handleDelete(service.id)}
-                  >Delete</button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <DataTable columns={columns} data={services} />
       </div>
       {showEditModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">

@@ -20,6 +20,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Leads resource routes
     Route::get('leads/graph', [LeadsController::class, 'graph']);
+    Route::get('reports/leads-summary', [LeadsController::class, 'leadsSummary']);
     Route::apiResource('leads', LeadsController::class);
 
     // Customers resource routes

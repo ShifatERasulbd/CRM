@@ -202,6 +202,24 @@ const dateDiffDetailed = (start, end) => {
                     <div>
                       <strong>Duty Days:</strong> {dateDiffDetailed(sp.joining_date, sp.end_date)}
                     </div>
+                    <div>
+                      <strong>Expected Salary:</strong> {(() => {
+                        const salary = parseFloat(sp.salary);
+                        const dutyDays = (() => {
+                          if (sp.joining_date && sp.end_date) {
+                            const start = new Date(sp.joining_date);
+                            const end = new Date(sp.end_date);
+                            return Math.floor((end - start) / (1000 * 60 * 60 * 24)) + 1;
+                          }
+                          return 0;
+                        })();
+                        if (!isNaN(salary) && dutyDays > 0) {
+                          const expected = (salary / 30) * dutyDays;
+                          return expected.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                        }
+                        return "-";
+                      })()}
+                    </div>
                   </div>
                 ))}
               </>

@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import LeadsForm from "../Leads/LeadsForm";
+import { DataTable } from "../../components/ui/data-table";
 
 export default function DealsList() {
   const [leads, setLeads] = useState([]);
@@ -144,55 +145,62 @@ export default function DealsList() {
         ))}
       </div>
 
-      <div className="overflow-x-auto rounded-lg shadow bg-white">
-        <table className="min-w-full text-sm border-collapse">
-          <thead>
-            <tr className="bg-gray-50">
-              <th className="px-4 py-2 text-left font-medium text-gray-700 border-b">Name</th>
-              <th className="px-4 py-2 text-left font-medium text-gray-700 border-b">Email</th>
-              <th className="px-4 py-2 text-left font-medium text-gray-700 border-b">Phone</th>
-              <th className="px-4 py-2 text-left font-medium text-gray-700 border-b">Company</th>
-              <th className="px-4 py-2 text-left font-medium text-gray-700 border-b">Service</th>
-              <th className="px-4 py-2 text-left font-medium text-gray-700 border-b">Status</th>
-              <th className="px-4 py-2 text-left font-medium text-gray-700 border-b">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredLeads.length === 0 ? (
-              <tr>
-                <td colSpan="7" className="px-4 py-8 text-center text-gray-500">
-                  No deals found.
-                </td>
-              </tr>
-            ) : (
-              filteredLeads.map((lead) => (
-                <tr key={lead.id} className="border-b last:border-b-0 hover:bg-gray-50">
-                  <td className="px-4 py-2">{lead.first_name || ''} {lead.last_name || ''}</td>
-                  <td className="px-4 py-2">{lead.email || '-'}</td>
-                  <td className="px-4 py-2">{lead.phone || '-'}</td>
-                  <td className="px-4 py-2">{lead.company || '-'}</td>
-                  <td className="px-4 py-2">
-                    {lead.service && typeof lead.service === 'object'
-                      ? lead.service.name || '-'
-                      : '-'}
-                  </td>
-                  <td className="px-4 py-2">{lead.status || '-'}</td>
-                  <td className="px-4 py-2 flex gap-2">
-                    <button
-                      className="bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600"
-                      onClick={() => handleEdit(lead)}
-                    >Edit</button>
-                    <button
-                      className="bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600"
-                      onClick={() => handleDelete(lead.id)}
-                    >Delete</button>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+      {/* Shadcn DataTable for Deals */}
+      <DataTable
+        columns={[
+          {
+            accessorKey: "first_name",
+            header: "Name",
+            cell: ({ row }) => `${row.original.first_name || ''} ${row.original.last_name || ''}`,
+          },
+          {
+            accessorKey: "email",
+            header: "Email",
+            cell: ({ row }) => row.original.email || "-",
+          },
+          {
+            accessorKey: "phone",
+            header: "Phone",
+            cell: ({ row }) => row.original.phone || "-",
+          },
+          {
+            accessorKey: "company",
+            header: "Company",
+            cell: ({ row }) => row.original.company || "-",
+          },
+          {
+            accessorKey: "service",
+            header: "Service",
+            cell: ({ row }) => row.original.service?.name || "-",
+          },
+          {
+            accessorKey: "status",
+            header: "Status",
+            cell: ({ row }) => row.original.status || "-",
+          },
+          {
+            id: "actions",
+            header: "Actions",
+            cell: ({ row }) => (
+              <div className="flex gap-2">
+                <button
+                  className="bg-blue-500 text-white px-2 py-1 rounded text-xs"
+                  onClick={() => window.location.href = `/deals/${row.original.id}`}
+                >View</button>
+                <button
+                  className="bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600"
+                  onClick={() => handleEdit(row.original)}
+                >Edit</button>
+                <button
+                  className="bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600"
+                  onClick={() => handleDelete(row.original.id)}
+                >Delete</button>
+              </div>
+            ),
+          },
+        ]}
+        data={filteredLeads}
+      />
 
       {showEditModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">

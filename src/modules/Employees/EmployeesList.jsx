@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import EmployeesForm from "./EmployeesForm";
+import { DataTable } from "../../components/ui/data-table";
 
 const EmployeesList = () => {
   const [employees, setEmployees] = useState([]);
@@ -119,6 +120,70 @@ const EmployeesList = () => {
     );
   });
 
+  // DataTable columns
+  const columns = [
+    {
+      accessorKey: "first_name",
+      header: "First Name",
+      cell: ({ row }) => row.original.first_name,
+    },
+    {
+      accessorKey: "last_name",
+      header: "Last Name",
+      cell: ({ row }) => row.original.last_name,
+    },
+    {
+      accessorKey: "email",
+      header: "Email",
+      cell: ({ row }) => row.original.email,
+    },
+    {
+      accessorKey: "phone",
+      header: "Phone",
+      cell: ({ row }) => row.original.phone,
+    },
+    {
+      accessorKey: "position",
+      header: "Position",
+      cell: ({ row }) => row.original.position,
+    },
+    {
+      accessorKey: "department",
+      header: "Department",
+      cell: ({ row }) => row.original.department,
+    },
+    {
+      accessorKey: "hire_date",
+      header: "Hire Date",
+      cell: ({ row }) => row.original.hire_date,
+    },
+    {
+      accessorKey: "salary",
+      header: "Salary",
+      cell: ({ row }) => row.original.salary,
+    },
+    {
+      id: "actions",
+      header: "Actions",
+      cell: ({ row }) => (
+        <div className="flex gap-2">
+          <button
+            className="bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600"
+            onClick={() => setEditEmployee(row.original)}
+          >Edit</button>
+          <button
+            className="bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600"
+            onClick={() => handleDelete(row.original.id)}
+          >Delete</button>
+          <button
+            className="bg-gray-700 text-white px-2 py-1 rounded text-xs hover:bg-gray-900"
+            onClick={() => handleShowLog(row.original)}
+          >Log</button>
+        </div>
+      ),
+    },
+  ];
+
   return (
     <div className="max-w-6xl mx-auto">
       <div className="flex items-center justify-between mb-4">
@@ -151,93 +216,46 @@ const EmployeesList = () => {
         ))}
       </div>
       <div className="overflow-x-auto rounded-lg shadow bg-white">
-        <table className="min-w-full text-sm border-collapse">
-          <thead>
-            <tr className="bg-gray-50">
-              <th className="px-4 py-2 text-left font-medium text-gray-700 border-b">First Name</th>
-              <th className="px-4 py-2 text-left font-medium text-gray-700 border-b">Last Name</th>
-              <th className="px-4 py-2 text-left font-medium text-gray-700 border-b">Email</th>
-              <th className="px-4 py-2 text-left font-medium text-gray-700 border-b">Phone</th>
-              <th className="px-4 py-2 text-left font-medium text-gray-700 border-b">Position</th>
-              <th className="px-4 py-2 text-left font-medium text-gray-700 border-b">Department</th>
-              <th className="px-4 py-2 text-left font-medium text-gray-700 border-b">Hire Date</th>
-              <th className="px-4 py-2 text-left font-medium text-gray-700 border-b">Salary</th>
-              <th className="px-4 py-2 text-left font-medium text-gray-700 border-b">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredEmployees.map((employee) => (
-              <tr key={employee.id} className="border-b last:border-b-0 hover:bg-gray-50">
-                <td className="px-4 py-2">{employee.first_name}</td>
-                <td className="px-4 py-2">{employee.last_name}</td>
-                <td className="px-4 py-2">{employee.email}</td>
-                <td className="px-4 py-2">{employee.phone}</td>
-                <td className="px-4 py-2">{employee.position}</td>
-                <td className="px-4 py-2">{employee.department}</td>
-                <td className="px-4 py-2">{employee.hire_date}</td>
-                <td className="px-4 py-2">{employee.salary}</td>
-                <td className="px-4 py-2 flex gap-2">
-                  <button
-                    className="bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600"
-                    onClick={() => setEditEmployee(employee)}
-                  >Edit</button>
-                  <button
-                    className="bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600"
-                    onClick={() => handleDelete(employee.id)}
-                  >Delete</button>
-                  <button
-                    className="bg-gray-700 text-white px-2 py-1 rounded text-xs hover:bg-gray-900"
-                    onClick={() => handleShowLog(employee)}
-                  >Log</button>
-                </td>
-                    {/* Login Log Modal (moved outside the map) */}
-                    {logModal.open && (
-                      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-                        <div className="bg-white rounded-lg shadow-lg p-6 relative w-full max-w-xl">
-                          <button
-                            className="absolute top-2 right-2 text-gray-500 hover:text-black text-xl"
-                            onClick={() => setLogModal({ open: false, employee: null, logs: [], loading: false, error: null })}
-                          >
-                            &times;
-                          </button>
-                          <h2 className="text-lg font-bold mb-2">Login Log for {logModal.employee?.first_name} {logModal.employee?.last_name}</h2>
-                          {logModal.loading ? (
-                            <div>Loading...</div>
-                          ) : logModal.error ? (
-                            <div className="text-red-600">{logModal.error}</div>
-                          ) : logModal.logs.length === 0 ? (
-                            <div>No login logs found.</div>
-                          ) : (
-                            <ul className="divide-y divide-gray-200 max-h-64 overflow-y-auto">
-                              {logModal.logs.map((log, idx) => (
-                                <li key={idx} className="py-2">
-                                  {(() => {
-                                    let date = '', time = '';
-                                    if (log.login_at) {
-                                      const dt = new Date(log.login_at);
-                                      date = dt.toLocaleDateString();
-                                      time = dt.toLocaleTimeString();
-                                    }
-                                    return (
-                                      <>
-                                        <div><span className="font-semibold">Date:</span> {date}</div>
-                                        <div><span className="font-semibold">Time:</span> {time}</div>
-                                        
-                                      </>
-                                    );
-                                  })()}
-                                </li>
-                              ))}
-                            </ul>
-                          )}
-                        </div>
-                      </div>
-                    )}
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <DataTable columns={columns} data={filteredEmployees} />
       </div>
+
+      {logModal.open && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white rounded-lg shadow-lg p-6 relative w-full max-w-xl">
+            <button
+              className="absolute top-2 right-2 text-gray-500 hover:text-black text-xl"
+              onClick={() => setLogModal({ open: false, employee: null, logs: [], loading: false, error: null })}
+            >
+              &times;
+            </button>
+            <h2 className="text-lg font-bold mb-2">Login Log for {logModal.employee?.first_name} {logModal.employee?.last_name}</h2>
+            {logModal.loading ? (
+              <div>Loading...</div>
+            ) : logModal.error ? (
+              <div className="text-red-600">{logModal.error}</div>
+            ) : logModal.logs.length === 0 ? (
+              <div>No login logs found.</div>
+            ) : (
+              <ul className="divide-y divide-gray-200 max-h-64 overflow-y-auto">
+                {logModal.logs.map((log, idx) => {
+                  let date = '', time = '';
+                  if (log.login_at) {
+                    const dt = new Date(log.login_at);
+                    date = dt.toLocaleDateString();
+                    time = dt.toLocaleTimeString();
+                  }
+                  return (
+                    <li key={idx} className="py-2">
+                      <div><span className="font-semibold">Date:</span> {date}</div>
+                      <div><span className="font-semibold">Time:</span> {time}</div>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </div>
+        </div>
+      )}
 
       {editEmployee && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">

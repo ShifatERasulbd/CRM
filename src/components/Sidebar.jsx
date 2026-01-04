@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 
 export default function Sidebar() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [open, setOpen] = useState(false);
 
   const handleLogout = async () => {
@@ -54,17 +55,18 @@ export default function Sidebar() {
           </button>
         </div>
         <nav className="flex-1 px-4 space-y-2">
-          <Link to="/dashboard" className="block px-4 py-2 rounded hover:bg-muted" onClick={() => setOpen(false)}>Overview</Link>
-          <Link to="/leads" className="block px-4 py-2 rounded hover:bg-muted" onClick={() => setOpen(false)}>Leads</Link>
-          <Link to="/oppertuinities" className="block px-4 py-2 rounded hover:bg-muted" onClick={() => setOpen(false)}>Oppertunities</Link>
-          <Link to="/deals" className="block px-4 py-2 rounded hover:bg-muted" onClick={() => setOpen(false)}>Deals</Link>
-          <Link to="/verified" className="block px-4 py-2 rounded hover:bg-muted" onClick={() => setOpen(false)}>Verified</Link>
-          <Link to="/customers" className="block px-4 py-2 rounded hover:bg-muted" onClick={() => setOpen(false)}>Customers</Link>
-          <Link to="/service" className="block px-4 py-2 rounded hover:bg-muted" onClick={() => setOpen(false)}>Services</Link>
-          <Link to="/activities" className="block px-4 py-2 rounded hover:bg-muted" onClick={() => setOpen(false)}>Activities</Link>
-          <Link to="/task&followups" className="block px-4 py-2 rounded hover:bg-muted" onClick={() => setOpen(false)}>Task & Followups</Link>
-          <Link to="/employees" className="block px-4 py-2 rounded hover:bg-muted" onClick={() => setOpen(false)}>Employees</Link>
-            <Link to="/service-people" className="block px-4 py-2 rounded hover:bg-muted" onClick={() => setOpen(false)}>Service People</Link>
+          <Link to="/dashboard" className={`block px-4 py-2 rounded hover:bg-muted${location.pathname === "/dashboard" ? " bg-blue-100 text-blue-700 font-semibold" : ""}`} onClick={() => setOpen(false)}>Overview</Link>
+          <Link to="/leads" className={`block px-4 py-2 rounded hover:bg-muted${location.pathname === "/leads" ? " bg-blue-100 text-blue-700 font-semibold" : ""}`} onClick={() => setOpen(false)}>Leads</Link>
+          <Link to="/oppertuinities" className={`block px-4 py-2 rounded hover:bg-muted${location.pathname === "/oppertuinities" ? " bg-blue-100 text-blue-700 font-semibold" : ""}`} onClick={() => setOpen(false)}>Oppertunities</Link>
+          <Link to="/deals" className={`block px-4 py-2 rounded hover:bg-muted${location.pathname === "/deals" ? " bg-blue-100 text-blue-700 font-semibold" : ""}`} onClick={() => setOpen(false)}>Deals</Link>
+          <Link to="/verified" className={`block px-4 py-2 rounded hover:bg-muted${location.pathname === "/verified" ? " bg-blue-100 text-blue-700 font-semibold" : ""}`} onClick={() => setOpen(false)}>Verified</Link>
+          <Link to="/customers" className={`block px-4 py-2 rounded hover:bg-muted${location.pathname === "/customers" ? " bg-blue-100 text-blue-700 font-semibold" : ""}`} onClick={() => setOpen(false)}>Customers</Link>
+          <Link to="/service" className={`block px-4 py-2 rounded hover:bg-muted${location.pathname === "/service" ? " bg-blue-100 text-blue-700 font-semibold" : ""}`} onClick={() => setOpen(false)}>Services</Link>
+          <Link to="/activities" className={`block px-4 py-2 rounded hover:bg-muted${location.pathname === "/activities" ? " bg-blue-100 text-blue-700 font-semibold" : ""}`} onClick={() => setOpen(false)}>Activities</Link>
+          <Link to="/task&followups" className={`block px-4 py-2 rounded hover:bg-muted${location.pathname === "/task&followups" ? " bg-blue-100 text-blue-700 font-semibold" : ""}`} onClick={() => setOpen(false)}>Task & Followups</Link>
+          <Link to="/employees" className={`block px-4 py-2 rounded hover:bg-muted${location.pathname === "/employees" ? " bg-blue-100 text-blue-700 font-semibold" : ""}`} onClick={() => setOpen(false)}>Employees</Link>
+          <Link to="/service-people" className={`block px-4 py-2 rounded hover:bg-muted${location.pathname === "/service-people" ? " bg-blue-100 text-blue-700 font-semibold" : ""}`} onClick={() => setOpen(false)}>Service People</Link>
+          <Link to="/reports" className={`block px-4 py-2 rounded hover:bg-muted${location.pathname === "/reports" ? " bg-blue-100 text-blue-700 font-semibold" : ""}`} onClick={() => setOpen(false)}>Reports</Link>
         </nav>
         <div className="p-4 border-t flex flex-col gap-2">
           <span>User Menu</span>

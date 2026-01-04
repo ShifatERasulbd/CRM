@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import CustomersForm from "./CustomersForm";
 import LeadsForm from "../Leads/LeadsForm";
+import { DataTable } from "../../components/ui/data-table";
 
 const Customers = () => {
   const [customers, setCustomers] = useState([]);
@@ -120,6 +121,61 @@ const Customers = () => {
     );
   });
 
+  // DataTable columns
+  const columns = [
+    {
+      accessorKey: "name",
+      header: "Name",
+      cell: ({ row }) => `${row.original.first_name || ""} ${row.original.last_name || ""}`,
+    },
+    {
+      accessorKey: "email",
+      header: "Email",
+      cell: ({ row }) => row.original.email,
+    },
+    {
+      accessorKey: "phone",
+      header: "Phone",
+      cell: ({ row }) => row.original.phone,
+    },
+    {
+      accessorKey: "company",
+      header: "Company",
+      cell: ({ row }) => row.original.company,
+    },
+    {
+      accessorKey: "status",
+      header: "Status",
+      cell: ({ row }) => row.original.status,
+    },
+    {
+      id: "actions",
+      header: "Actions",
+      cell: ({ row }) => (
+        <div className="flex gap-2">
+          <button
+            onClick={() => handleView(row.original)}
+            className="bg-blue-500 text-white px-2 py-1 rounded text-xs"
+          >
+            View
+          </button>
+          <button
+            onClick={() => handleEdit(row.original)}
+            className="bg-indigo-500 text-white px-2 py-1 rounded text-xs"
+          >
+            Edit
+          </button>
+          <button
+            onClick={() => handleDelete(row.original.id)}
+            className="bg-red-500 text-white px-2 py-1 rounded text-xs"
+          >
+            Delete
+          </button>
+        </div>
+      ),
+    },
+  ];
+
   return (
     <div className="mt-8 max-w-4xl mx-auto">
       {/* Title and Search Bar */}
@@ -134,62 +190,7 @@ const Customers = () => {
         />
       </div>
       <div className="overflow-x-auto rounded-lg shadow bg-white">
-        <table className="min-w-full text-sm">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-4 py-2 text-left">Name</th>
-              <th className="px-4 py-2 text-left">Email</th>
-              <th className="px-4 py-2 text-left">Phone</th>
-              <th className="px-4 py-2 text-left">Company</th>
-              <th className="px-4 py-2 text-left">Status</th>
-              <th className="px-4 py-2 text-left">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredCustomers.length === 0 ? (
-              <tr>
-                <td colSpan="6" className="px-4 py-8 text-center text-gray-500">
-                  No customers found.
-                </td>
-              </tr>
-            ) : (
-              filteredCustomers.map((customer) => (
-                <tr
-                  key={customer.id}
-                  className="border-b hover:bg-gray-50"
-                >
-                  <td className="px-4 py-2">
-                    {customer.first_name} {customer.last_name}
-                  </td>
-                  <td className="px-4 py-2">{customer.email}</td>
-                  <td className="px-4 py-2">{customer.phone}</td>
-                  <td className="px-4 py-2">{customer.company}</td>
-                  <td className="px-4 py-2">{customer.status}</td>
-                  <td className="px-4 py-2 flex gap-2">
-                    <button
-                      onClick={() => handleView(customer)}
-                      className="bg-blue-500 text-white px-2 py-1 rounded text-xs"
-                    >
-                      View
-                    </button>
-                    <button
-                      onClick={() => handleEdit(customer)}
-                      className="bg-indigo-500 text-white px-2 py-1 rounded text-xs"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDelete(customer.id)}
-                      className="bg-red-500 text-white px-2 py-1 rounded text-xs"
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+        <DataTable columns={columns} data={filteredCustomers} />
       </div>
 
       {showLeadsEditModal && (

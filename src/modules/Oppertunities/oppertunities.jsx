@@ -7,14 +7,7 @@ export default function Leads() {
 
   return (
     <>
-      <div className="flex justify-end mb-4">
-        <button
-          className="bg-black text-white px-4 py-2 rounded font-semibold hover:bg-gray-900"
-          onClick={() => setShowModal(true)}
-        >
-          Add Lead
-        </button>
-      </div>
+      
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
           <div className="bg-white rounded-lg shadow-lg p-6 relative w-full max-w-xl">

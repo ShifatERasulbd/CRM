@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import LeadsForm from "./LeadsForm";
 import { useNavigate } from "react-router-dom";
+import { DataTable } from "../../components/ui/data-table";
 export default function LeadsList() {
     const [search, setSearch] = useState("");
   const navigate = useNavigate();
@@ -122,6 +123,74 @@ export default function LeadsList() {
       );
     });
 
+    // Shadcn DataTable columns
+    const columns = [
+      {
+        accessorKey: "first_name",
+        header: "First Name",
+        cell: ({ row }) => row.original.first_name || "-",
+      },
+      {
+        accessorKey: "last_name",
+        header: "Last Name",
+        cell: ({ row }) => row.original.last_name || "-",
+      },
+      {
+        accessorKey: "email",
+        header: "Email",
+        cell: ({ row }) => row.original.email || "-",
+      },
+      {
+        accessorKey: "phone",
+        header: "Phone",
+        cell: ({ row }) => row.original.phone || "-",
+      },
+      {
+        accessorKey: "company",
+        header: "Company",
+        cell: ({ row }) => row.original.company || "-",
+      },
+      {
+        accessorKey: "service",
+        header: "Service",
+        cell: ({ row }) => row.original.service?.name || "-",
+      },
+      {
+        accessorKey: "status",
+        header: "Status",
+        cell: ({ row }) => (
+          <span className={`px-2 py-1 rounded text-xs ${
+            row.original.status === 'new' ? 'bg-blue-100 text-blue-800' :
+            row.original.status === 'contacted' ? 'bg-yellow-100 text-yellow-800' :
+            row.original.status === 'qualified' ? 'bg-green-100 text-green-800' :
+            'bg-gray-100 text-gray-800'
+          }`}>
+            {row.original.status || 'new'}
+          </span>
+        ),
+      },
+      {
+        id: "actions",
+        header: "Actions",
+        cell: ({ row }) => (
+          <div className="flex gap-2">
+            <button
+              onClick={() => handleView(row.original)}
+              className="bg-blue-500 text-white px-2 py-1 rounded text-xs"
+            >View</button>
+            <button
+              className="bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600"
+              onClick={() => handleEdit(row.original)}
+            >Edit</button>
+            <button
+              className="bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600"
+              onClick={() => handleDelete(row.original.id)}
+            >Delete</button>
+          </div>
+        ),
+      },
+    ];
+
     return (
       <div className="mt-8 w-full">
         {/* Title and Search Bar */}
@@ -150,93 +219,29 @@ export default function LeadsList() {
           ))}
         </div>
 
-        <div className="overflow-x-auto rounded-lg shadow bg-white">
-        <table className="w-full text-sm border-collapse">
-          <thead>
-            <tr className="bg-gray-50">
-              <th className="px-4 py-2 text-left font-medium text-gray-700 border-b">Name</th>
-              <th className="px-4 py-2 text-left font-medium text-gray-700 border-b">Email</th>
-              <th className="px-4 py-2 text-left font-medium text-gray-700 border-b">Phone</th>
-              <th className="px-4 py-2 text-left font-medium text-gray-700 border-b">Company</th>
-              <th className="px-4 py-2 text-left font-medium text-gray-700 border-b">Service</th>
-              <th className="px-4 py-2 text-left font-medium text-gray-700 border-b">Status</th>
-              <th className="px-4 py-2 text-left font-medium text-gray-700 border-b">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredLeads.length === 0 ? (
-              <tr>
-                <td colSpan="7" className="px-4 py-8 text-center text-gray-500">
-                  No leads found. Click "Add Lead" to create your first lead.
-                </td>
-              </tr>
-            ) : (
-              filteredLeads.map((lead) => (
-                <tr key={lead.id} className="border-b last:border-b-0 hover:bg-gray-50">
-                  <td className="px-4 py-2">
-                    {lead.first_name || ''} {lead.last_name || ''}
-                  </td>
-                  <td className="px-4 py-2">{lead.email || '-'}</td>
-                  <td className="px-4 py-2">{lead.phone || '-'}</td>
-                  <td className="px-4 py-2">{lead.company || '-'}</td>
-                  <td className="px-4 py-2">
-                    {lead.service && typeof lead.service === 'object'
-                      ? lead.service.name || '-'
-                      : '-'}
-                  </td>
-                  <td className="px-4 py-2">
-                    <span className={`px-2 py-1 rounded text-xs ${
-                      lead.status === 'new' ? 'bg-blue-100 text-blue-800' :
-                      lead.status === 'contacted' ? 'bg-yellow-100 text-yellow-800' :
-                      lead.status === 'qualified' ? 'bg-green-100 text-green-800' :
-                      'bg-gray-100 text-gray-800'
-                    }`}>
-                      {lead.status || 'new'}
-                    </span>
-                  </td>
-                  <td className="px-4 py-2 flex gap-2">
-                     <button
-                    onClick={() => handleView(lead)}
-                    className="bg-blue-500 text-white px-2 py-1 rounded text-xs"
-                  >
-                    View
-                  </button>
-                    <button
-                      className="bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600"
-                      onClick={() => handleEdit(lead)}
-                    >Edit</button>
-                    <button
-                      className="bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600"
-                      onClick={() => handleDelete(lead.id)}
-                    >Delete</button>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+        {/* Shadcn DataTable */}
+        <DataTable columns={columns} data={filteredLeads} />
 
-      {showEditModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-          <div className="bg-white rounded-lg shadow-lg p-6 relative w-full max-w-4xl overflow-y-auto max-h-screen">
-            <button
-              className="absolute top-2 right-2 text-gray-500 hover:text-black text-xl"
-              onClick={() => setShowEditModal(false)}
-            >
-              &times;
-            </button>
-            <LeadsForm
-              initialData={editLead}
-              onSuccess={() => {
-                setShowEditModal(false);
-                setRefresh(r => r + 1);
-              }}
-              isEdit={true}
-            />
+        {showEditModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+            <div className="bg-white rounded-lg shadow-lg p-6 relative w-full max-w-4xl overflow-y-auto max-h-screen">
+              <button
+                className="absolute top-2 right-2 text-gray-500 hover:text-black text-xl"
+                onClick={() => setShowEditModal(false)}
+              >
+                &times;
+              </button>
+              <LeadsForm
+                initialData={editLead}
+                onSuccess={() => {
+                  setShowEditModal(false);
+                  setRefresh(r => r + 1);
+                }}
+                isEdit={true}
+              />
+            </div>
           </div>
-        </div>
-      )}
-    </div>
-  );
+        )}
+      </div>
+    );
 }
