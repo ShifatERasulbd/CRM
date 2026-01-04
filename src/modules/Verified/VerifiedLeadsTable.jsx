@@ -9,6 +9,7 @@ export default function VerifiedLeadsTable() {
   const [editLead, setEditLead] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [refresh, setRefresh] = useState(0);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     const fetchVerifiedLeads = async () => {
@@ -61,10 +62,33 @@ export default function VerifiedLeadsTable() {
 
   // Ensure leads is always an array
   const safeLeads = Array.isArray(leads) ? leads : [];
+  // Filter verified leads by search
+  const filteredLeads = safeLeads.filter(lead => {
+    const searchTerm = search.toLowerCase();
+    return (
+      (lead.first_name && lead.first_name.toLowerCase().includes(searchTerm)) ||
+      (lead.last_name && lead.last_name.toLowerCase().includes(searchTerm)) ||
+      (lead.email && lead.email.toLowerCase().includes(searchTerm)) ||
+      (lead.phone && lead.phone.toLowerCase().includes(searchTerm)) ||
+      (lead.company && lead.company.toLowerCase().includes(searchTerm)) ||
+      (lead.status && lead.status.toLowerCase().includes(searchTerm)) ||
+      (lead.service && typeof lead.service === 'object' && lead.service.name && lead.service.name.toLowerCase().includes(searchTerm))
+    );
+  });
 
   return (
     <div className="mt-8 max-w-4xl mx-auto">
-      <h2 className="text-lg font-semibold mb-2">Verified Leads</h2>
+      {/* Title and Search Bar */}
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-lg font-semibold">Verified Leads</h2>
+        <input
+          type="text"
+          placeholder="Search verified leads..."
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          className="border rounded px-3 py-2 w-64"
+        />
+      </div>
       <div className="overflow-x-auto rounded-lg shadow bg-white">
         <table className="min-w-full text-sm border-collapse">
           <thead>
@@ -79,35 +103,35 @@ export default function VerifiedLeadsTable() {
             </tr>
           </thead>
           <tbody>
-            {safeLeads.length === 0 ? (
+            {filteredLeads.length === 0 ? (
               <tr>
                 <td colSpan="7" className="px-4 py-8 text-center text-gray-500">
                   No verified leads found.
                 </td>
               </tr>
             ) : (
-              safeLeads.map((lead) => (
-              <tr key={lead.id} className="border-b last:border-b-0 hover:bg-gray-50">
-                <td className="px-4 py-2">{lead.first_name || ''} {lead.last_name || ''}</td>
-                <td className="px-4 py-2">{lead.email || '-'}</td>
-                <td className="px-4 py-2">{lead.phone || '-'}</td>
-                <td className="px-4 py-2">{lead.company || '-'}</td>
-                <td className="px-4 py-2">
-                  {lead.service && typeof lead.service === 'object'
-                    ? lead.service.name || '-'
-                    : '-'}
-                </td>
-                <td className="px-4 py-2">{lead.status || '-'}</td>
-                <td className="px-4 py-2 flex gap-2">
-                  <button
-                    className="bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600"
-                    onClick={() => {
-                      setEditLead(lead);
-                      setShowEditModal(true);
-                    }}
-                  >Edit</button>
-                </td>
-              </tr>
+              filteredLeads.map((lead) => (
+                <tr key={lead.id} className="border-b last:border-b-0 hover:bg-gray-50">
+                  <td className="px-4 py-2">{lead.first_name || ''} {lead.last_name || ''}</td>
+                  <td className="px-4 py-2">{lead.email || '-'}</td>
+                  <td className="px-4 py-2">{lead.phone || '-'}</td>
+                  <td className="px-4 py-2">{lead.company || '-'}</td>
+                  <td className="px-4 py-2">
+                    {lead.service && typeof lead.service === 'object'
+                      ? lead.service.name || '-'
+                      : '-'}
+                  </td>
+                  <td className="px-4 py-2">{lead.status || '-'}</td>
+                  <td className="px-4 py-2 flex gap-2">
+                    <button
+                      className="bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600"
+                      onClick={() => {
+                        setEditLead(lead);
+                        setShowEditModal(true);
+                      }}
+                    >Edit</button>
+                  </td>
+                </tr>
               ))
             )}
           </tbody>

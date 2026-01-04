@@ -1,4 +1,5 @@
 import React from "react";
+import { Toaster } from "sonner";
 import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 import Sidebar from "./components/Sidebar";
 import Dashboard from "./modules/Dashboard/dashboard";
@@ -58,6 +59,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen w-full bg-muted/40 md:flex">
+      <Toaster richColors position="top-right" />
       {showSidebar && <Sidebar />}
       {/* Add pt-16 to main for mobile burger menu space */}
       <main className={showSidebar ? "p-6 space-y-6 pt-16 md:pt-6" : "p-6 space-y-6 pt-16 md:pt-6"}>

@@ -2,12 +2,30 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import EmployeesForm from "./EmployeesForm";
 
-export default function EmployeesList() {
+const EmployeesList = () => {
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [editEmployee, setEditEmployee] = useState(null);
   const [refresh, setRefresh] = useState(0);
+  const [search, setSearch] = useState("");
+  const [logModal, setLogModal] = useState({ open: false, employee: null, logs: [], loading: false, error: null });
+  // Fetch login logs for an employee
+  const handleShowLog = async (employee) => {
+    setLogModal({ open: true, employee, logs: [], loading: true, error: null });
+    try {
+      const token = localStorage.getItem("token");
+      const res = await axios.get(`/api/employees/${employee.id}/login-logs`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: "application/json",
+        },
+      });
+      setLogModal({ open: true, employee, logs: res.data, loading: false, error: null });
+    } catch (err) {
+      setLogModal({ open: true, employee, logs: [], loading: false, error: err.response?.data?.message || "Failed to load logs" });
+    }
+  };
 
   useEffect(() => {
     const fetchEmployees = async () => {
@@ -87,9 +105,32 @@ export default function EmployeesList() {
     return acc;
   }, {});
 
+  // Filter employees by search
+  const filteredEmployees = employees.filter(employee => {
+    const searchTerm = search.toLowerCase();
+    return (
+      (employee.first_name && employee.first_name.toLowerCase().includes(searchTerm)) ||
+      (employee.last_name && employee.last_name.toLowerCase().includes(searchTerm)) ||
+      (employee.email && employee.email.toLowerCase().includes(searchTerm)) ||
+      (employee.phone && employee.phone.toLowerCase().includes(searchTerm)) ||
+      (employee.position && employee.position.toLowerCase().includes(searchTerm)) ||
+      (employee.department && employee.department.toLowerCase().includes(searchTerm)) ||
+      (employee.hire_date && employee.hire_date.toLowerCase().includes(searchTerm))
+    );
+  });
+
   return (
     <div className="max-w-6xl mx-auto">
-      <h2 className="text-lg font-semibold mb-2">Employees</h2>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-lg font-semibold">Employees</h2>
+        <input
+          type="text"
+          placeholder="Search employees..."
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          className="border rounded px-3 py-2 w-64"
+        />
+      </div>
       {/* Statistics Section */}
       <div className="mb-4 grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="bg-gray-100 rounded p-3 text-center">
@@ -125,7 +166,7 @@ export default function EmployeesList() {
             </tr>
           </thead>
           <tbody>
-            {employees.map((employee) => (
+            {filteredEmployees.map((employee) => (
               <tr key={employee.id} className="border-b last:border-b-0 hover:bg-gray-50">
                 <td className="px-4 py-2">{employee.first_name}</td>
                 <td className="px-4 py-2">{employee.last_name}</td>
@@ -144,7 +185,54 @@ export default function EmployeesList() {
                     className="bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600"
                     onClick={() => handleDelete(employee.id)}
                   >Delete</button>
+                  <button
+                    className="bg-gray-700 text-white px-2 py-1 rounded text-xs hover:bg-gray-900"
+                    onClick={() => handleShowLog(employee)}
+                  >Log</button>
                 </td>
+                    {/* Login Log Modal (moved outside the map) */}
+                    {logModal.open && (
+                      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+                        <div className="bg-white rounded-lg shadow-lg p-6 relative w-full max-w-xl">
+                          <button
+                            className="absolute top-2 right-2 text-gray-500 hover:text-black text-xl"
+                            onClick={() => setLogModal({ open: false, employee: null, logs: [], loading: false, error: null })}
+                          >
+                            &times;
+                          </button>
+                          <h2 className="text-lg font-bold mb-2">Login Log for {logModal.employee?.first_name} {logModal.employee?.last_name}</h2>
+                          {logModal.loading ? (
+                            <div>Loading...</div>
+                          ) : logModal.error ? (
+                            <div className="text-red-600">{logModal.error}</div>
+                          ) : logModal.logs.length === 0 ? (
+                            <div>No login logs found.</div>
+                          ) : (
+                            <ul className="divide-y divide-gray-200 max-h-64 overflow-y-auto">
+                              {logModal.logs.map((log, idx) => (
+                                <li key={idx} className="py-2">
+                                  {(() => {
+                                    let date = '', time = '';
+                                    if (log.login_at) {
+                                      const dt = new Date(log.login_at);
+                                      date = dt.toLocaleDateString();
+                                      time = dt.toLocaleTimeString();
+                                    }
+                                    return (
+                                      <>
+                                        <div><span className="font-semibold">Date:</span> {date}</div>
+                                        <div><span className="font-semibold">Time:</span> {time}</div>
+                                        
+                                      </>
+                                    );
+                                  })()}
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </div>
+                      </div>
+                    )}
               </tr>
             ))}
           </tbody>
@@ -173,4 +261,6 @@ export default function EmployeesList() {
 
     </div>
   );
-}
+};
+
+export default EmployeesList;

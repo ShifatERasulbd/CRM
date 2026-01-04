@@ -20,5 +20,6 @@ class ServicePerson extends Model
         'emergency_contact_name',
         'emergency_contact_phone',
         'emergency_contact_relation',
+        'salary',
     ];
 }

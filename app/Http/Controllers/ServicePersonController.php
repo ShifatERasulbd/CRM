@@ -26,6 +26,7 @@ class ServicePersonController extends Controller
             'emergency_contact_name' => 'required|string',
             'emergency_contact_phone' => 'required|string',
             'emergency_contact_relation' => 'required|string',
+            'salary' => 'nullable|numeric|min:0',
         ]);
         $servicePerson = ServicePerson::create($validated);
         return response()->json($servicePerson, 201);
@@ -51,6 +52,7 @@ class ServicePersonController extends Controller
             'emergency_contact_name' => 'sometimes|required|string',
             'emergency_contact_phone' => 'sometimes|required|string',
             'emergency_contact_relation' => 'sometimes|required|string',
+            'salary' => 'nullable|numeric|min:0',
         ]);
         $servicePerson->update($validated);
         return response()->json($servicePerson);

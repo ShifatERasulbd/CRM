@@ -14,6 +14,11 @@ class User extends Authenticatable
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasApiTokens, HasFactory, Notifiable;
 
+    public function employee()
+    {
+        return $this->hasOne(Employee::class, 'email', 'email');
+    }
+
     /**
      * The attributes that are mass assignable.
      *

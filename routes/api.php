@@ -42,6 +42,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
    // Employees resource routes
        Route::apiResource('employees', App\Http\Controllers\Api\EmployeesController::class);
+   // Employee login logs
+       Route::get('employees/{employee}/login-logs', [\App\Http\Controllers\Api\EmployeeLoginHistoryController::class, 'index']);
     // ServicePeople resource routes
     Route::apiResource('service-people', ServicePersonController::class);
 

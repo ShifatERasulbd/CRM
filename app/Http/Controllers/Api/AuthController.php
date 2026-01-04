@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
+use App\Models\Employee;
+use App\Models\EmployeeLoginHistory;
 
 class AuthController extends Controller
 {
@@ -22,6 +24,16 @@ class AuthController extends Controller
         }
 
         $token = $user->createToken('crm-token')->plainTextToken;
+
+        // Log login if user is an employee
+        $employee = Employee::where('email', $user->email)->first();
+        if ($employee) {
+            EmployeeLoginHistory::create([
+                'employee_id' => $employee->id,
+                'login_at' => now(),
+            ]);
+        }
+
         return response()->json([
             'token' => $token,
             'user' => $user,

@@ -14,6 +14,7 @@ export default function ServicePeopleForm({ onSuccess, initialData }) {
       emergency_contact_name: "",
       emergency_contact_phone: "",
       emergency_contact_relation: "",
+      salary: "",
     }
   );
   const [errors, setErrors] = useState({});
@@ -166,6 +167,19 @@ export default function ServicePeopleForm({ onSuccess, initialData }) {
             required
           />
           {errors.emergency_contact_relation && <div className="text-red-500 text-sm">{errors.emergency_contact_relation}</div>}
+        </div>
+        <div>
+          <label className="block font-semibold">Salary</label>
+          <input
+            name="salary"
+            type="number"
+            min="0"
+            step="0.01"
+            value={form.salary}
+            onChange={handleChange}
+            className="border rounded px-3 py-2 w-full"
+          />
+          {errors.salary && <div className="text-red-500 text-sm">{errors.salary}</div>}
         </div>
       </div>
       <button

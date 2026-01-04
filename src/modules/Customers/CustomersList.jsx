@@ -11,6 +11,7 @@ const Customers = () => {
   const [editCustomer, setEditCustomer] = useState(null);
   const [showLeadsEditModal, setShowLeadsEditModal] = useState(false);
   const [refresh, setRefresh] = useState(0);
+  const [search, setSearch] = useState("");
 
   const navigate = useNavigate();
 
@@ -106,11 +107,32 @@ const Customers = () => {
 
   // Ensure customers is always an array
   const safeCustomers = Array.isArray(customers) ? customers : [];
+  // Filter customers by search
+  const filteredCustomers = safeCustomers.filter(customer => {
+    const searchTerm = search.toLowerCase();
+    return (
+      (customer.first_name && customer.first_name.toLowerCase().includes(searchTerm)) ||
+      (customer.last_name && customer.last_name.toLowerCase().includes(searchTerm)) ||
+      (customer.email && customer.email.toLowerCase().includes(searchTerm)) ||
+      (customer.phone && customer.phone.toLowerCase().includes(searchTerm)) ||
+      (customer.company && customer.company.toLowerCase().includes(searchTerm)) ||
+      (customer.status && customer.status.toLowerCase().includes(searchTerm))
+    );
+  });
 
   return (
     <div className="mt-8 max-w-4xl mx-auto">
-      <h2 className="text-lg font-semibold mb-3">Customers</h2>
-
+      {/* Title and Search Bar */}
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-lg font-semibold">Customers</h2>
+        <input
+          type="text"
+          placeholder="Search customers..."
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          className="border rounded px-3 py-2 w-64"
+        />
+      </div>
       <div className="overflow-x-auto rounded-lg shadow bg-white">
         <table className="min-w-full text-sm">
           <thead className="bg-gray-50">
@@ -124,46 +146,46 @@ const Customers = () => {
             </tr>
           </thead>
           <tbody>
-            {safeCustomers.length === 0 ? (
+            {filteredCustomers.length === 0 ? (
               <tr>
                 <td colSpan="6" className="px-4 py-8 text-center text-gray-500">
                   No customers found.
                 </td>
               </tr>
             ) : (
-              safeCustomers.map((customer) => (
-              <tr
-                key={customer.id}
-                className="border-b hover:bg-gray-50"
-              >
-                <td className="px-4 py-2">
-                  {customer.first_name} {customer.last_name}
-                </td>
-                <td className="px-4 py-2">{customer.email}</td>
-                <td className="px-4 py-2">{customer.phone}</td>
-                <td className="px-4 py-2">{customer.company}</td>
-                <td className="px-4 py-2">{customer.status}</td>
-                <td className="px-4 py-2 flex gap-2">
-                  <button
-                    onClick={() => handleView(customer)}
-                    className="bg-blue-500 text-white px-2 py-1 rounded text-xs"
-                  >
-                    View
-                  </button>
-                  <button
-                    onClick={() => handleEdit(customer)}
-                    className="bg-indigo-500 text-white px-2 py-1 rounded text-xs"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(customer.id)}
-                    className="bg-red-500 text-white px-2 py-1 rounded text-xs"
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
+              filteredCustomers.map((customer) => (
+                <tr
+                  key={customer.id}
+                  className="border-b hover:bg-gray-50"
+                >
+                  <td className="px-4 py-2">
+                    {customer.first_name} {customer.last_name}
+                  </td>
+                  <td className="px-4 py-2">{customer.email}</td>
+                  <td className="px-4 py-2">{customer.phone}</td>
+                  <td className="px-4 py-2">{customer.company}</td>
+                  <td className="px-4 py-2">{customer.status}</td>
+                  <td className="px-4 py-2 flex gap-2">
+                    <button
+                      onClick={() => handleView(customer)}
+                      className="bg-blue-500 text-white px-2 py-1 rounded text-xs"
+                    >
+                      View
+                    </button>
+                    <button
+                      onClick={() => handleEdit(customer)}
+                      className="bg-indigo-500 text-white px-2 py-1 rounded text-xs"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDelete(customer.id)}
+                      className="bg-red-500 text-white px-2 py-1 rounded text-xs"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
               ))
             )}
           </tbody>

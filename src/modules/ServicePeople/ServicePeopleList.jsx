@@ -10,6 +10,7 @@ export default function ServicePeopleList() {
   const [error, setError] = useState(null);
   const [editServicePerson, setEditServicePerson] = useState(null);
   const [refresh, setRefresh] = useState(0);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     const fetchServicePeople = async () => {
@@ -78,9 +79,31 @@ export default function ServicePeopleList() {
     return <div className="text-red-600 font-semibold">{error}</div>;
   }
 
+  // Filter service people by search
+  const filteredServicePeople = servicePeople.filter(person => {
+    const searchTerm = search.toLowerCase();
+    return (
+      (person.first_name && person.first_name.toLowerCase().includes(searchTerm)) ||
+      (person.last_name && person.last_name.toLowerCase().includes(searchTerm)) ||
+      (person.phone && person.phone.toLowerCase().includes(searchTerm)) ||
+      (person.email && person.email.toLowerCase().includes(searchTerm)) ||
+      (person.present_address && person.present_address.toLowerCase().includes(searchTerm)) ||
+      (person.permanent_address && person.permanent_address.toLowerCase().includes(searchTerm))
+    );
+  });
+
   return (
     <div className="max-w-6xl mx-auto">
-      <h2 className="text-lg font-semibold mb-2">Service People</h2>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-lg font-semibold">Service People</h2>
+        <input
+          type="text"
+          placeholder="Search service people..."
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          className="border rounded px-3 py-2 w-64"
+        />
+      </div>
       <div className="overflow-x-auto rounded-lg shadow bg-white">
         <table className="min-w-full text-sm border-collapse">
           <thead>
@@ -91,15 +114,11 @@ export default function ServicePeopleList() {
               <th className="px-4 py-2 text-left font-medium text-gray-700 border-b">Email</th>
               <th className="px-4 py-2 text-left font-medium text-gray-700 border-b">Present Address</th>
               <th className="px-4 py-2 text-left font-medium text-gray-700 border-b">Permanent Address</th>
-              <th className="px-4 py-2 text-left font-medium text-gray-700 border-b">Photo</th>
-              <th className="px-4 py-2 text-left font-medium text-gray-700 border-b">Emergency Contact Name</th>
-              <th className="px-4 py-2 text-left font-medium text-gray-700 border-b">Emergency Contact Phone</th>
-              <th className="px-4 py-2 text-left font-medium text-gray-700 border-b">Emergency Contact Relation</th>
               <th className="px-4 py-2 text-left font-medium text-gray-700 border-b">Actions</th>
             </tr>
           </thead>
           <tbody>
-            {servicePeople.map((person) => (
+            {filteredServicePeople.map((person) => (
               <tr key={person.id} className="border-b last:border-b-0 hover:bg-gray-50">
                 <td className="px-4 py-2">{person.first_name}</td>
                 <td className="px-4 py-2">{person.last_name}</td>
@@ -107,10 +126,6 @@ export default function ServicePeopleList() {
                 <td className="px-4 py-2">{person.email}</td>
                 <td className="px-4 py-2">{person.present_address}</td>
                 <td className="px-4 py-2">{person.permanent_address}</td>
-                <td className="px-4 py-2">{person.photo ? <img src={person.photo} alt="" width="40" className="rounded" /> : ''}</td>
-                <td className="px-4 py-2">{person.emergency_contact_name}</td>
-                <td className="px-4 py-2">{person.emergency_contact_phone}</td>
-                <td className="px-4 py-2">{person.emergency_contact_relation}</td>
                 <td className="px-4 py-2 flex gap-2">
                   <button
                     className="bg-green-500 text-white px-2 py-1 rounded text-xs hover:bg-green-600"
