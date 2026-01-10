@@ -12,7 +12,22 @@ class EmployeesController extends Controller
 {
     public function index()
     {
-        return response()->json(Employee::latest()->get());
+        // Return employees with their related user id for assignment
+        $employees = Employee::with('user')->latest()->get()->map(function($emp) {
+            return [
+                'id' => $emp->user ? $emp->user->id : null, // user id for assignment
+                'first_name' => $emp->first_name,
+                'last_name' => $emp->last_name,
+                'email' => $emp->email,
+                'position' => $emp->position,
+                'department' => $emp->department,
+                'phone' => $emp->phone,
+                'joining_date' => $emp->joining_date,
+                'end_date' => $emp->end_date,
+                'salary' => $emp->salary,
+            ];
+        });
+        return response()->json($employees);
     }
 
     public function store(Request $request)

@@ -71,6 +71,7 @@ export default function LeadsForm({
     const data = editData || initialData;
     if (data) {
       console.log('Lead data received:', data); // Debug log
+      console.log('assigned_to value:', data.assigned_to); // Debug log
 
       // Support both snake_case and camelCase for API response
       const lspArr = data.lead_service_people || data.leadServicePeople || [];
@@ -109,12 +110,27 @@ export default function LeadsForm({
 
       console.log('Formatted service person dates:', servicePersonDates); // Debug log
 
+      // Extract only the fields we need, avoiding relationship objects
+      const assignedToId = data.assigned_to ? String(data.assigned_to) : "";
+      const serviceId = data.service_id ? String(data.service_id) : "";
+      const referenceByCustomer = data.reference_by_customer ? String(data.reference_by_customer) : "";
+
+      console.log('Setting assigned_to to:', assignedToId); // Debug log
+
       setForm(f => ({
         ...f,
-        ...data,
-        assigned_to: data.assigned_to ? String(data.assigned_to) : "",
-        service_id: data.service_id ? String(data.service_id) : "",
-        reference_by_customer: data.reference_by_customer ? String(data.reference_by_customer) : "",
+        first_name: data.first_name || "",
+        last_name: data.last_name || "",
+        email: data.email || "",
+        phone: data.phone || "",
+        company: data.company || "",
+        status: data.status || "new",
+        source: data.source || "",
+        notes: data.notes || "",
+        assigned_to: assignedToId,
+        service_id: serviceId,
+        reference_by_customer: referenceByCustomer,
+        reference_by_staff: data.reference_by_staff || "",
         service_person_dates: servicePersonDates,
       }));
     }

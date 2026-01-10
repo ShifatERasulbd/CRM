@@ -123,23 +123,13 @@ class LeadsController extends Controller
     public function index(Request $request)
     {
         try {
-            $user = $request->user();
-
             // Get filter parameters
             $from = $request->query('from');
             $to = $request->query('to');
             $status = $request->query('status');
 
-            // Build base query
+            // Build base query (no user filter)
             $query = Lead::with('assignedTo', 'createdBy', 'leadServicePeople.servicePerson');
-
-            // Apply user filter
-            if ($user && $user->email === 'test@example.com') {
-                // Admin sees all leads
-            } else {
-                // Regular users see only their assigned leads
-                $query->where('assigned_to', $user?->id);
-            }
 
             // Apply date range filters
             if ($from) {
